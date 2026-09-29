@@ -34,6 +34,68 @@ describe('createApp', () => {
     expect(root.querySelector('.project-detail__title').textContent).toBe('Volvo Bank');
   });
 
+  it('renders the project modal on top of the home carousel, not instead of it', () => {
+    const router = createApp(root, { header, footer });
+    window.location.hash = '#/project/volvo';
+    router.start();
+
+    expect(root.querySelector('.view--home')).not.toBeNull();
+    expect(root.querySelector('.project-carousel')).not.toBeNull();
+    expect(root.querySelector('.project-modal')).not.toBeNull();
+  });
+
+  it('closes the project modal when its onClose navigates back to the root route', () => {
+    const router = createApp(root, { header, footer });
+    window.location.hash = '#/project/volvo';
+    router.start();
+
+    root.querySelector('.project-modal__close').click();
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+
+    expect(root.querySelector('.project-modal')).toBeNull();
+    expect(root.querySelector('.project-carousel')).not.toBeNull();
+  });
+
+  it('navigates to the next project when the modal onNext handler runs', () => {
+    const router = createApp(root, { header, footer });
+    window.location.hash = '#/project/stefanini';
+    router.start();
+
+    root.querySelector('.project-modal__nav--next').click();
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+
+    expect(root.querySelector('.project-detail__title').textContent).not.toBe('Stefanini Group');
+  });
+
+  it('navigates to the previous project when the modal onPrev handler runs', () => {
+    const router = createApp(root, { header, footer });
+    window.location.hash = '#/project/volvo';
+    router.start();
+
+    root.querySelector('.project-modal__nav--prev').click();
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+
+    expect(root.querySelector('.project-detail__title').textContent).toBe('Stefanini Group');
+  });
+
+  it('does not render a prev button for the first project in the list', () => {
+    const router = createApp(root, { header, footer });
+    window.location.hash = '#/project/stefanini';
+    router.start();
+
+    expect(root.querySelector('.project-modal__nav--prev')).toBeNull();
+    expect(root.querySelector('.project-modal__nav--next')).not.toBeNull();
+  });
+
+  it('does not render a next button for the last project in the list', () => {
+    const router = createApp(root, { header, footer });
+    window.location.hash = '#/project/frontline';
+    router.start();
+
+    expect(root.querySelector('.project-modal__nav--next')).toBeNull();
+    expect(root.querySelector('.project-modal__nav--prev')).not.toBeNull();
+  });
+
   it('renders a not-found state for an unknown project id', () => {
     const router = createApp(root, { header, footer });
     window.location.hash = '#/project/does-not-exist';
@@ -83,6 +145,14 @@ describe('createApp', () => {
 
     expect(header.querySelector('.site-nav')).not.toBeNull();
     expect(footer.querySelector('a')).not.toBeNull();
+  });
+
+  it('renders LinkedIn and contact links in the header', () => {
+    createApp(root, { header, footer });
+
+    const utilityLinks = header.querySelectorAll('.site-nav__utility a');
+    expect(utilityLinks).toHaveLength(2);
+    expect(utilityLinks[1].getAttribute('href')).toBe('mailto:marcelximenes@proton.me');
   });
 
   it('works without header/footer elements (optional chrome)', () => {

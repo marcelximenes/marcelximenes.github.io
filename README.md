@@ -34,7 +34,8 @@ src/
     router/           Router baseado em hash, sem dependências
     i18n/             Sistema de idiomas (PT/EN): estado, detecção, textos da UI
     data/             Dados estáticos (projetos, experiência) — bilíngues
-    components/       Funções que retornam elementos DOM (ProjectCard, etc.)
+    components/       Funções que retornam elementos DOM (ProjectCard,
+                       ProjectCarousel, ProjectModal, etc.)
     views/            Composição de componentes por página
     utils/            Helpers de DOM (createElement, escapeHtml, ...)
 tests/                Testes unitários (Vitest), espelhando src/js
@@ -50,6 +51,18 @@ docs/
   `(props) => HTMLElement`.
 - **Router em hash**: funciona em qualquer host estático (GitHub Pages,
   Cloudflare Pages, S3...) sem precisar configurar rewrites de servidor.
+- **Home como carrossel + modal, não duas páginas**: `/project/:id` não
+  navega para uma página separada — renderiza a `HomeView` (carrossel)
+  normalmente e empilha um modal (`ProjectModal`) por cima, com o case
+  study do projeto (`ProjectDetail`, reaproveitado sem alteração). Isso
+  preserva o carrossel por baixo (posição, cards visíveis) e permite
+  navegar para o projeto anterior/seguinte sem fechar o modal — seta
+  esquerda/direita ou os botões `‹`/`›`, que apontam para os projetos
+  adjacentes na mesma ordem exibida no carrossel. Escape ou clique fora
+  fecha o modal (equivalente a voltar para `#/`).
+- **Navegação por teclado no carrossel**: seta esquerda/direita move o
+  foco entre os cards (`ProjectCarousel`), sem depender de nenhuma
+  biblioteca — só `document.activeElement` e um listener de `keydown`.
 - **`app.js` separado de `main.js`**: `createApp()` não tem side effects no
   import (não toca `document` fora de receber o root element), o que permite
   testar o roteamento completo sem depender do DOM global da página real.
@@ -87,9 +100,9 @@ npm run validate       # lint + format:check + test — roda tudo, como no CI
 
 ## Testes
 
-Cobertura atual: **100% statements/lines/funcs, ~97% branches** em
+Cobertura atual: **~100% statements/lines/funcs, ~97% branches** em
 `src/js/` (exceto `main.js`, que é só bootstrap e não tem lógica a testar).
-71 testes. Rodar `npm run test:coverage` gera relatório HTML em
+94 testes. Rodar `npm run test:coverage` gera relatório HTML em
 `coverage/index.html`.
 
 Convenção: cada arquivo em `src/js/**/*.js` tem um `.test.js`

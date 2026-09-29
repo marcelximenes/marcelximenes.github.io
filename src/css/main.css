@@ -51,6 +51,13 @@ a {
   gap: 1rem;
 }
 
+.site-nav__utility {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  opacity: 0.85;
+}
+
 .language-switch {
   display: flex;
   gap: 0.25rem;
@@ -101,16 +108,40 @@ main {
   margin: 0.5rem 0 0;
 }
 
-.project-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+.project-carousel {
+  margin: 0 -1.5rem;
+  padding: 0 1.5rem;
+}
+
+.project-carousel__track {
+  display: flex;
   gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-block: 0.25rem 1rem;
+  scrollbar-width: thin;
+}
+
+.project-carousel__track .project-card {
+  flex: 0 0 280px;
+  scroll-snap-align: start;
+}
+
+.project-carousel__hint {
+  margin: 0;
+  font-size: 0.75rem;
+  opacity: 0.6;
 }
 
 .project-card {
   border: 1px solid #eee;
   border-radius: 8px;
   overflow: hidden;
+}
+
+.project-card__link:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
 }
 
 .project-card__title,
@@ -122,6 +153,66 @@ main {
   display: inline-block;
   margin: 0.5rem 1rem 1rem;
   font-weight: 600;
+}
+
+.project-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  z-index: 100;
+}
+
+.project-modal:focus {
+  outline: none;
+}
+
+.project-modal__dialog {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 760px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2rem;
+}
+
+.project-modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+}
+
+.project-modal__nav {
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.project-modal__nav:hover,
+.project-modal__nav:focus-visible {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .project-detail__back {

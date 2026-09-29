@@ -3,6 +3,9 @@ import { createElement } from '../utils/dom.js';
 
 import { LanguageSwitch } from './LanguageSwitch.js';
 
+const LINKEDIN_URL = 'https://www.linkedin.com/in/marcelximenes/';
+const CONTACT_EMAIL = 'marcelximenes@proton.me';
+
 /**
  * Renderiza a navegação principal do site.
  * @param {string} locale
@@ -19,5 +22,12 @@ export function SiteHeader(locale) {
     createElement('a', { href: '#/testimonials' }, [t(locale, 'nav.testimonials')]),
   ]);
 
-  return createElement('nav', { className: 'site-nav' }, [brand, links, LanguageSwitch()]);
+  const utility = createElement('div', { className: 'site-nav__utility' }, [
+    createElement('a', { href: LINKEDIN_URL, target: '_blank', rel: 'noopener noreferrer' }, [
+      t(locale, 'nav.linkedin'),
+    ]),
+    createElement('a', { href: `mailto:${CONTACT_EMAIL}` }, [t(locale, 'nav.contact')]),
+  ]);
+
+  return createElement('nav', { className: 'site-nav' }, [brand, links, utility, LanguageSwitch()]);
 }

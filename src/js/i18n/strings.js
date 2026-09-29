@@ -11,6 +11,8 @@ export const strings = {
       projects: 'Projects',
       experience: 'Experience',
       testimonials: 'Testimonials',
+      linkedin: 'LinkedIn',
+      contact: 'Contact',
     },
     hero: {
       eyebrow: 'Senior Product Designer',
@@ -22,6 +24,11 @@ export const strings = {
       notFoundTitle: 'Project not found',
       placeholder: 'Full case study content coming soon.',
       imagePlaceholder: 'Image coming soon',
+      carouselLabel: 'Projects',
+      carouselHint: 'Use the arrow keys to browse projects',
+      close: 'Close',
+      prevProject: 'Previous project',
+      nextProject: 'Next project',
     },
     experience: {
       title: 'My Experience',
@@ -44,6 +51,8 @@ export const strings = {
       projects: 'Projetos',
       experience: 'Experiência',
       testimonials: 'Depoimentos',
+      linkedin: 'LinkedIn',
+      contact: 'Contato',
     },
     hero: {
       eyebrow: 'Senior Product Designer',
@@ -55,6 +64,11 @@ export const strings = {
       notFoundTitle: 'Projeto não encontrado',
       placeholder: 'Case study completo em breve.',
       imagePlaceholder: 'Imagem em breve',
+      carouselLabel: 'Projetos',
+      carouselHint: 'Use as setas do teclado para navegar entre os projetos',
+      close: 'Fechar',
+      prevProject: 'Projeto anterior',
+      nextProject: 'Próximo projeto',
     },
     experience: {
       title: 'Minha Experiência',

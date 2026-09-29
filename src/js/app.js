@@ -5,7 +5,6 @@ import { Router } from './router/router.js';
 import { clearElement } from './utils/dom.js';
 import { ExperienceView } from './views/ExperienceView.js';
 import { HomeView } from './views/HomeView.js';
-import { ProjectView } from './views/ProjectView.js';
 import { TestimonialsView } from './views/TestimonialsView.js';
 
 /**
@@ -40,7 +39,13 @@ export function createApp(rootElement, chrome = {}) {
   function renderView() {
     clearElement(rootElement);
     rootElement.append(currentViewFactory(getLocale()));
-    window.scrollTo(0, 0);
+
+    const modal = rootElement.querySelector('.project-modal');
+    if (modal) {
+      modal.focus();
+    } else {
+      window.scrollTo(0, 0);
+    }
   }
 
   /** @param {(locale: string) => HTMLElement} viewFactory */
@@ -53,7 +58,7 @@ export function createApp(rootElement, chrome = {}) {
 
   router
     .register('/', () => render((locale) => HomeView(locale)))
-    .register('/project/:id', ({ id }) => render((locale) => ProjectView(id, locale)))
+    .register('/project/:id', ({ id }) => render((locale) => HomeView(locale, id)))
     .register('/experience', () => render((locale) => ExperienceView(locale)))
     .register('/testimonials', () => render((locale) => TestimonialsView(locale)))
     .notFound(() => render((locale) => HomeView(locale)));
