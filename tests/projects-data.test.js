@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { getProjectById, getProjectTranslation, projects } from '../src/js/data/projects.js';
 
 describe('projects data', () => {
-  it('has six projects, matching the original portfolio', () => {
-    expect(projects).toHaveLength(6);
+  it('has eight projects: six migrated from the original portfolio plus two new case studies', () => {
+    expect(projects).toHaveLength(8);
   });
 
   it('every project has a unique id', () => {

@@ -389,6 +389,114 @@ export const projects = [
       },
     },
   },
+  {
+    id: 'nidus',
+    translations: {
+      en: {
+        title: 'NIDUS — Federal Police Child Protection Platform',
+        summary:
+          'Design thinking and prototyping for a national platform that centralizes and triages child-abuse reports for the Brazilian Federal Police. Project currently in active discovery.',
+        sections: [
+          {
+            heading: '2. Context: a legal mandate, an unsustainable volume',
+            paragraphs: [
+              'Brazilian legislation on child protection online now requires every internet provider operating in the country to report suspected child-abuse material through a structured channel, regardless of where the provider is based. The Federal Police receives these reports and is responsible for authenticating them, preserving a legally sound chain of custody, and triaging them so that the most urgent cases reach an investigator first.',
+              'The existing intake process was not built for the resulting volume, and the strain was structural rather than a matter of individual effort: a system that decides, case by case, which report reaches a human being next needs to be trustworthy in a way that goes beyond usability. This is the mandate the platform — internally named NIDUS — exists to fulfill: not to investigate, but to receive, authenticate, enrich, and route with enough rigor that investigation can begin without doubt about the material handed to it.',
+            ],
+          },
+          {
+            heading: '3. Discovery: designing for people under sustained pressure',
+            paragraphs: [
+              'My role on this project is design thinking and prototyping within a small, focused team. Discovery started with stakeholder interviews across the roles that would actually touch the system day to day: the analysts who triage incoming reports, the technical leadership responsible for the platform, and the providers who submit reports in the first place — three very different relationships to the same queue.',
+              'A recurring theme shaped several early decisions: the people reviewing this material are exposed to it repeatedly, and the interface itself is part of what determines whether that exposure is sustainable. That informed choices like automatic filtering/blurring of sensitive media by default and deliberately avoiding language — even in public-facing and management-facing communication — that could make the system read as a black-box "AI decision" rather than a tool that supports a human judgment call. ⚠️ These are documented product decisions from project meetings; the underlying interviews and their full detail are internal to the client engagement and not reproduced here.',
+              'A structured validation flow was designed to walk an analyst through a case in a consistent order — case data, the people involved, the incoming media, and a final review — rather than leaving triage to unstructured judgment under time pressure. An early interactive prototype of this flow was reviewed with the technical stakeholders responsible for the current process and approved as a direction to continue building on.',
+            ],
+          },
+          {
+            heading: '4. Design decisions: trust before polish',
+            paragraphs: [
+              "The platform deliberately does not follow the Brazilian federal government's public-facing design standard for its analyst-facing side — a conscious choice to prioritize a fast, low-friction interface for people working under time pressure over visual conformity with citizen-facing government sites, since the primary users here are internal investigators, not the public.",
+              'Custody and traceability requirements shaped interface decisions as much as usability did: every step needs to be attributable and time-stamped in a way that would hold up as part of an investigation, which meant validation states and audit trails were treated as core interface requirements from the first prototype, not an afterthought layered on later.',
+            ],
+          },
+          {
+            heading: '5. Where the project stands',
+            paragraphs: [
+              'This case study describes work in progress, not a finished product. As of this writing, the interactive prototype has been reviewed and approved as a direction by the relevant technical stakeholders, and the team is moving from prototype into build. ⚠️ Scope, architecture, and timeline are still being defined at this stage and are likely to evolve — this section will be updated as the project matures rather than presented as a completed outcome.',
+            ],
+          },
+          {
+            heading: '6. Strategic learnings',
+            paragraphs: [
+              'Designing for people who make high-stakes judgment calls under sustained exposure to difficult material is a different discipline from designing for efficiency alone — protecting the analyst is a legitimate design requirement, not a nice-to-have layered on top of the "real" interface.',
+              'Chain-of-custody and legal defensibility are not backend concerns that design can ignore. When every action may need to be accounted for later, traceability has to be visible and understandable in the interface itself, not just logged somewhere the user never sees.',
+              "Conformance to a visual standard is a means, not an end. Choosing not to follow the federal government's citizen-facing design system here was a deliberate call based on who the actual users are — a reminder that design systems exist to serve users, not the other way around.",
+            ],
+          },
+        ],
+      },
+      pt: {
+        title: 'NIDUS — Plataforma de Proteção Infantil da Polícia Federal',
+        summary:
+          'Design thinking e prototipação para uma plataforma nacional que centraliza e faz a triagem de denúncias de abuso infantil para a Polícia Federal. Projeto atualmente em descoberta ativa.',
+        sections: [], // TODO: traduzir (conteúdo original em inglês, ver translations.en acima)
+      },
+    },
+  },
+  {
+    id: 'frontline',
+    translations: {
+      en: {
+        title: 'Frontline — Federal Design System Alignment',
+        summary:
+          'Leading the initial diagnostic to align the Federal Police internal design system with Brazil’s federal government Design System standard, before committing to a work plan. Project in initial assessment phase.',
+        sections: [
+          {
+            heading: '2. Context: two design systems, one federal mandate',
+            paragraphs: [
+              'The Brazilian federal government maintains its own official Design System, and government-linked institutions are expected to align with it as a matter of digital interoperability policy. The Federal Police maintains its own internal design system, built over years for the needs of internal, investigator-facing tools rather than citizen-facing services — different technology, different constraints, different users.',
+              'A formal request came in asking for an assessment of how well the internal system currently adheres to the federal standard, a document guiding internal teams on mandatory use of the official design kits, and technical guidance on evolving the internal system going forward. My role is leading the diagnostic phase that has to happen before any of that can be responsibly scoped and estimated.',
+            ],
+          },
+          {
+            heading: '3. Method: separating fact from assumption before estimating',
+            paragraphs: [
+              "The request itself didn't name the internal system explicitly or specify which version of the federal standard it referred to — two points that materially change the scope of the work. Rather than assume and proceed, both were documented explicitly as assumptions pending confirmation, alongside the reasoning and evidence supporting each one, so that anyone reviewing the diagnostic could see exactly what was inferred versus confirmed.",
+              'This project also benefited from a prior comparative analysis between the two design systems, produced during earlier work on a related initiative. Rather than starting technical discovery from zero, the diagnostic phase focused on re-reading that existing analysis through the lens of this specific request, and identifying precisely where genuinely new research was still needed — the Figma design kits had not yet been evaluated, for instance — versus where the answer already existed and only needed to be reframed and formalized.',
+            ],
+          },
+          {
+            heading: '4. What the diagnostic found',
+            paragraphs: [
+              'The comparison surfaced structural gaps rather than surface-level ones: design tokens defined in a way that never actually reaches the running theme at runtime, no dark-mode support, an incompatible typographic scale, and accessibility-focused states that exist informally rather than as a defined system of tokens. These are foundational issues — the kind that require re-architecting how the system is built, not swapping out a color palette.',
+              "On the more encouraging side, the federal government's official ecosystem already ships supported component libraries for the same frameworks the internal system uses, which meaningfully de-risks part of the requested technical guidance: it's less a question of building new integration tooling from scratch and more one of evaluating and recommending adoption of what the government has already published.",
+              '⚠️ The diagnostic also flagged an open question that materially affects project scope: whether "alignment" is expected to mean a recommendation document, actual implementation work on the internal system, or both — this had not yet been confirmed with the requesting party at the time of writing and was raised explicitly as a blocker to committing hours to a detailed plan.',
+            ],
+          },
+          {
+            heading: '5. Where the project stands',
+            paragraphs: [
+              'This case study describes a diagnostic phase, not a completed engagement. A structured, high-level work plan has been drafted as a starting point for discussion, built on the assumption of full scope until the open questions above are resolved. ⚠️ Timelines, budget, and final scope are pending confirmation and are deliberately not presented here as settled facts.',
+            ],
+          },
+          {
+            heading: '6. Strategic learnings',
+            paragraphs: [
+              'Reusing prior work honestly is a skill in itself. The temptation on a new request is to start fresh; the more disciplined move was recognizing how much of an earlier analysis already answered this new question, and being precise about what genuinely still needed investigation.',
+              "Naming assumptions explicitly protects everyone. A request that doesn't spell out its own scope isn't a gap to quietly fill in with a best guess — surfacing exactly what's assumed versus confirmed, and why, is what makes an estimate defensible later.",
+              'Diagnosing before estimating prevents the most expensive kind of rework. Committing hours to a plan before scope is confirmed risks building the wrong thing efficiently — a documented open question is more valuable at this stage than a premature plan.',
+            ],
+          },
+        ],
+      },
+      pt: {
+        title: 'Frontline — Alinhamento a Design System Federal',
+        summary:
+          'Condução do diagnóstico inicial para alinhar o design system interno da Polícia Federal ao padrão de Design System do governo federal brasileiro, antes de comprometer um plano de trabalho. Projeto em fase de avaliação inicial.',
+        sections: [], // TODO: traduzir (conteúdo original em inglês, ver translations.en acima)
+      },
+    },
+  },
 ];
 
 /**

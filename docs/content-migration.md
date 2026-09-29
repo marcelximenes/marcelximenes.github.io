@@ -19,15 +19,31 @@ Todo conteúdo de dados (`projects.js`, `experience.js`) segue a forma
 
 ## O que já está no código
 
-- **6 projetos** (`src/js/data/projects.js`): título, resumo e os **6 case
-  studies completos, com seções e parágrafos, em inglês** (migrados
-  fielmente do site antigo, quebrados por subtítulo numerado).
-- **Versão em português dos projetos**: título e resumo **traduzidos**;
-  as seções longas dos case studies (`sections`) estão **vazias** —
-  **suposição**: como pedido, deixei só a estrutura pronta (chave `pt`
-  existe, com fallback automático para o inglês via `getProjectTranslation()`
-  enquanto não for preenchida) e não traduzi o conteúdo extenso sozinho, para
-  não arriscar tom/terminologia errados sem revisão sua.
+- **8 projetos** (`src/js/data/projects.js`): título, resumo e case study
+  completo, com seções e parágrafos, em inglês, para cada um.
+  - **6 migrados do site antigo** (Stefanini, Volvo, SESC/SENAC, SEDUC
+    Recife, Moinhos Connect, Inst. Ayrton Senna) — conteúdo fielmente
+    trazido do portfólio anterior, quebrado por subtítulo numerado.
+  - **2 novos, escritos diretamente para este portfólio**: **NIDUS**
+    (plataforma de proteção infantil da Polícia Federal) e **Frontline**
+    (alinhamento de design system interno da PF ao padrão federal).
+    Ambos descrevem projetos **em andamento** (discovery/diagnóstico), não
+    entregas concluídas — o texto é explícito sobre isso. Onde o texto
+    generaliza ou registra algo ainda não confirmado formalmente com o
+    cliente, isso está marcado com ⚠️ no próprio conteúdo (`sections` em
+    inglês), seguindo o mesmo padrão de "suposição explícita" usado nos
+    documentos de gestão. **Deliberadamente não incluem** nomes de pessoas
+    da PF, nomes de sistemas internos citados nos documentos de gestão
+    (ex.: sistemas de investigação, modelos de IA), ou números de volume —
+    por serem projetos ativos e confidenciais.
+- **Versão em português dos projetos**: título e resumo **traduzidos** em
+  todos os 8; as seções longas dos case studies (`sections`) estão
+  **vazias** para todos — **suposição**: como pedido, deixei só a
+  estrutura pronta (chave `pt` existe, com fallback automático para o
+  inglês via `getProjectTranslation()` enquanto não for preenchida) e não
+  traduzi o conteúdo extenso sozinho (nem o migrado, nem o novo de
+  NIDUS/Frontline), para não arriscar tom/terminologia errados sem revisão
+  sua.
 - **Experiência profissional** (`src/js/data/experience.js`): 7 posições e 13
   certificações. Cargo e descrição têm tradução PT completa (textos curtos,
   traduzi diretamente); certificações não são traduzidas (nomes próprios de

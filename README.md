@@ -98,8 +98,8 @@ função retorna/renderiza), não detalhes de implementação.
 
 ## Performance
 
-- Bundle de produção atual: **~49 kB JS** (≈17.6 kB gzip), **~2.5 kB CSS**,
-  sem dependências de runtime. O grosso do JS é conteúdo (os 6 case studies
+- Bundle de produção atual: **~60 kB JS** (≈21 kB gzip), **~2.5 kB CSS**,
+  sem dependências de runtime. O grosso do JS é conteúdo (os 8 case studies
   completos em inglês embutidos como dados), não código.
 - `chunkSizeWarningLimit` no Vite está propositalmente baixo (150 kB) para
   avisar cedo se algo inflar o bundle.
