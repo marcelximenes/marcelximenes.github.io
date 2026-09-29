@@ -13,6 +13,7 @@ export const strings = {
       testimonials: 'Testimonials',
       linkedin: 'LinkedIn',
       contact: 'Contact',
+      workWithMe: 'Work with me!',
     },
     hero: {
       eyebrow: 'Senior Product Designer',
@@ -44,6 +45,20 @@ export const strings = {
     languageSwitch: {
       label: 'Language',
     },
+    contactModal: {
+      title: 'Work with me!',
+      description: "Tell me a bit about you and I'll get back to you shortly.",
+      nameLabel: 'Company or your name',
+      namePlaceholder: 'Acme Inc. or Jane Doe',
+      emailLabel: 'Email',
+      emailPlaceholder: 'you@company.com',
+      phoneLabel: 'Phone',
+      phonePlaceholder: '+1 555 000 0000',
+      submit: 'Send',
+      cancel: 'Cancel',
+      close: 'Close',
+      emailSubject: 'Let’s work together',
+    },
   },
   pt: {
     nav: {
@@ -53,6 +68,7 @@ export const strings = {
       testimonials: 'Depoimentos',
       linkedin: 'LinkedIn',
       contact: 'Contato',
+      workWithMe: 'Work with me!',
     },
     hero: {
       eyebrow: 'Senior Product Designer',
@@ -83,6 +99,20 @@ export const strings = {
     },
     languageSwitch: {
       label: 'Idioma',
+    },
+    contactModal: {
+      title: 'Work with me!',
+      description: 'Conte um pouco sobre você que eu retorno em breve.',
+      nameLabel: 'Empresa ou seu nome',
+      namePlaceholder: 'Empresa Ltda. ou Maria Silva',
+      emailLabel: 'E-mail',
+      emailPlaceholder: 'voce@empresa.com',
+      phoneLabel: 'Telefone',
+      phonePlaceholder: '+55 11 90000-0000',
+      submit: 'Enviar',
+      cancel: 'Cancelar',
+      close: 'Fechar',
+      emailSubject: 'Vamos trabalhar juntos',
     },
   },
 };

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createApp } from '../src/js/app.js';
 
@@ -147,12 +147,83 @@ describe('createApp', () => {
     expect(footer.querySelector('a')).not.toBeNull();
   });
 
-  it('renders LinkedIn and contact links in the header', () => {
+  it('renders experience, testimonials, LinkedIn and contact as icon links in the header', () => {
     createApp(root, { header, footer });
 
-    const utilityLinks = header.querySelectorAll('.site-nav__utility a');
-    expect(utilityLinks).toHaveLength(2);
-    expect(utilityLinks[1].getAttribute('href')).toBe('mailto:marcelximenes@proton.me');
+    const iconLinks = header.querySelectorAll('.site-nav__icons a');
+    expect(iconLinks).toHaveLength(4);
+    expect(iconLinks[0].getAttribute('href')).toBe('#/experience');
+    expect(iconLinks[1].getAttribute('href')).toBe('#/testimonials');
+    expect(iconLinks[3].getAttribute('href')).toBe('mailto:marcelximenes@proton.me');
+  });
+
+  it('does not render a "Projects" link in the header (home already is the project list)', () => {
+    createApp(root, { header, footer });
+
+    const hrefs = Array.from(header.querySelectorAll('a')).map((a) => a.getAttribute('href'));
+    expect(hrefs.filter((href) => href === '#/')).toHaveLength(1); // only the brand link
+  });
+
+  it('renders a "Work with me!" button in the header', () => {
+    createApp(root, { header, footer });
+
+    const button = header.querySelector('.site-nav__cta');
+    expect(button).not.toBeNull();
+    expect(button.textContent).toBe('Work with me!');
+  });
+
+  it('opens the contact modal when "Work with me!" is clicked', () => {
+    createApp(root, { header, footer });
+
+    header.querySelector('.site-nav__cta').click();
+
+    expect(document.querySelector('.contact-modal')).not.toBeNull();
+    expect(document.querySelector('.contact-modal__title').textContent).toBe('Work with me!');
+  });
+
+  it('closes the contact modal via its close button', () => {
+    createApp(root, { header, footer });
+
+    header.querySelector('.site-nav__cta').click();
+    document.querySelector('.contact-modal__close').click();
+
+    expect(document.querySelector('.contact-modal')).toBeNull();
+  });
+
+  it('closes the contact modal on Escape', () => {
+    createApp(root, { header, footer });
+
+    header.querySelector('.site-nav__cta').click();
+    document
+      .querySelector('.contact-modal')
+      .dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+    expect(document.querySelector('.contact-modal')).toBeNull();
+  });
+
+  it('submitting the contact form opens a mailto link with the filled data and closes the modal', () => {
+    let capturedHref = null;
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(function mockClick() {
+        capturedHref = this.href;
+      });
+
+    createApp(root, { header, footer });
+    header.querySelector('.site-nav__cta').click();
+
+    document.getElementById('contact-name').value = 'Acme Inc.';
+    document.getElementById('contact-email').value = 'jane@acme.com';
+    document.getElementById('contact-phone').value = '+1 555 000 0000';
+
+    document
+      .querySelector('.contact-modal__form')
+      .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+
+    expect(capturedHref).toContain('mailto:marcelximenes@proton.me');
+    expect(document.querySelector('.contact-modal')).toBeNull();
+
+    clickSpy.mockRestore();
   });
 
   it('works without header/footer elements (optional chrome)', () => {
@@ -169,8 +240,20 @@ describe('createApp', () => {
     const languageButton = header.querySelector('[data-locale="pt"]');
     languageButton.click();
 
-    expect(header.querySelector('.site-nav__links a').textContent).toBe('Projetos');
+    expect(header.querySelector('.site-nav__cta').textContent).toBe('Work with me!');
     expect(root.querySelector('.hero__eyebrow').textContent).toBe('Senior Product Designer');
+  });
+
+  it('closes the contact modal when the language changes', () => {
+    const router = createApp(root, { header, footer });
+    router.start();
+
+    header.querySelector('.site-nav__cta').click();
+    expect(document.querySelector('.contact-modal')).not.toBeNull();
+
+    header.querySelector('[data-locale="pt"]').click();
+
+    expect(document.querySelector('.contact-modal')).toBeNull();
   });
 
   it('keeps the current route when re-rendering after a language change', () => {

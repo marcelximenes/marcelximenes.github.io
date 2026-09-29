@@ -1,3 +1,4 @@
+import { ContactModal } from './components/ContactModal.js';
 import { SiteFooter } from './components/SiteFooter.js';
 import { SiteHeader } from './components/SiteHeader.js';
 import { getLocale, initLocale, onLocaleChange } from './i18n/i18n.js';
@@ -11,23 +12,47 @@ import { TestimonialsView } from './views/TestimonialsView.js';
  * Cria e configura a aplicação: inicializa o idioma, registra rotas e
  * mantém header/footer/view atuais sincronizados com o idioma ativo.
  * @param {HTMLElement} rootElement - Container da view atual (<main id="app">).
- * @param {Object} [chrome] - Elementos de header/footer, se existirem no DOM.
+ * @param {Object} [chrome] - Elementos de header/footer/overlay, se existirem no DOM.
  * @param {HTMLElement} [chrome.header]
  * @param {HTMLElement} [chrome.footer]
+ * @param {HTMLElement} [chrome.overlay] - Container para modais globais
+ *   (ex: "Work with me!"), fora do fluxo de rotas. Se omitido, um
+ *   container é criado e anexado ao final do <body>.
  * @returns {Router}
  */
 export function createApp(rootElement, chrome = {}) {
   initLocale();
 
+  const overlayRoot =
+    chrome.overlay ??
+    (() => {
+      const el = document.createElement('div');
+      el.className = 'overlay-root';
+      document.body.append(el);
+      return el;
+    })();
+
   /** @type {(locale: string) => HTMLElement} */
   let currentViewFactory = () => HomeView(getLocale());
 
+  function closeContactModal() {
+    clearElement(overlayRoot);
+  }
+
+  function openContactModal() {
+    clearElement(overlayRoot);
+    const modal = ContactModal(getLocale(), { onClose: closeContactModal });
+    overlayRoot.append(modal);
+    modal.focus();
+  }
+
   function renderChrome() {
     const locale = getLocale();
+    closeContactModal();
 
     if (chrome.header) {
       clearElement(chrome.header);
-      chrome.header.append(SiteHeader(locale));
+      chrome.header.append(SiteHeader(locale, { onWorkWithMeClick: openContactModal }));
     }
 
     if (chrome.footer) {

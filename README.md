@@ -5,9 +5,10 @@ framework), com foco em performance, código limpo e cobertura de testes.
 Substitui o [portfólio anterior](https://portfolio.marcelximenes.workers.dev/).
 
 > Esta etapa entrega a **estruturação técnica completa** do projeto —
-> arquitetura, ferramentas, testes, CI. A identidade visual (cores,
-> tipografia, layout definitivo) é uma fase futura separada; o CSS atual é
-> intencionalmente mínimo.
+> arquitetura, ferramentas, testes, CI. A identidade visual final (tipografia
+> de marca, ilustrações, imagens reais) ainda é uma fase futura; o que existe
+> hoje é um tema escuro básico (fundo preto, tiles/CTA em alto contraste)
+> definido a partir de referências visuais, não um design system completo.
 
 ## Stack
 
@@ -27,7 +28,7 @@ terceiros.
 ```
 src/
   index.html          Ponto de entrada HTML (header/footer são renderizados via JS)
-  css/main.css        Estilos (mínimos, sem identidade visual ainda)
+  css/main.css        Estilos (tema escuro básico; identidade visual completa é fase futura)
   js/
     main.js           Bootstrap da aplicação
     app.js            Registro de rotas + renderização (testável isoladamente)
@@ -35,7 +36,7 @@ src/
     i18n/             Sistema de idiomas (PT/EN): estado, detecção, textos da UI
     data/             Dados estáticos (projetos, experiência) — bilíngues
     components/       Funções que retornam elementos DOM (ProjectCard,
-                       ProjectCarousel, ProjectModal, etc.)
+                       ProjectCarousel, ProjectModal, ContactModal, icons, etc.)
     views/            Composição de componentes por página
     utils/            Helpers de DOM (createElement, escapeHtml, ...)
 tests/                Testes unitários (Vitest), espelhando src/js
@@ -63,6 +64,18 @@ docs/
 - **Navegação por teclado no carrossel**: seta esquerda/direita move o
   foco entre os cards (`ProjectCarousel`), sem depender de nenhuma
   biblioteca — só `document.activeElement` e um listener de `keydown`.
+- **"Work with me!" sem backend**: o site é 100% estático (GitHub Pages),
+  então o formulário de contato (`ContactModal`) não envia nada para um
+  servidor — ao submeter, monta um link `mailto:` com os dados preenchidos
+  (nome/empresa, e-mail, telefone) e abre o cliente de e-mail do próprio
+  visitante já com a mensagem pronta; a pessoa ainda precisa clicar em
+  "enviar" no cliente dela. Se no futuro quiser um envio realmente
+  automático, precisa de um serviço de terceiros (ex: Formspree, EmailJS)
+  que aceite POST de formulário estático — não dá pra fazer 100% estático.
+- **Ícones inline, sem lib de ícones** (`components/icons.js`): SVGs
+  construídos via `document.createElementNS`, não `createElement` (que
+  usa `document.createElement`, errado para SVG/path — teria criado
+  elementos HTML inválidos em vez de SVG).
 - **`app.js` separado de `main.js`**: `createApp()` não tem side effects no
   import (não toca `document` fora de receber o root element), o que permite
   testar o roteamento completo sem depender do DOM global da página real.
@@ -102,7 +115,7 @@ npm run validate       # lint + format:check + test — roda tudo, como no CI
 
 Cobertura atual: **~100% statements/lines/funcs, ~97% branches** em
 `src/js/` (exceto `main.js`, que é só bootstrap e não tem lógica a testar).
-94 testes. Rodar `npm run test:coverage` gera relatório HTML em
+112 testes. Rodar `npm run test:coverage` gera relatório HTML em
 `coverage/index.html`.
 
 Convenção: cada arquivo em `src/js/**/*.js` tem um `.test.js`
