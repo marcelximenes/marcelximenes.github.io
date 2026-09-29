@@ -1,12 +1,14 @@
 import { ExperienceList } from '../components/ExperienceList.js';
 import { certifications, experience } from '../data/experience.js';
+import { t } from '../i18n/strings.js';
 import { createElement } from '../utils/dom.js';
 
 /**
  * Renderiza a página de experiência profissional e certificações.
+ * @param {string} locale
  * @returns {HTMLElement}
  */
-export function ExperienceView() {
+export function ExperienceView(locale) {
   const certList = createElement(
     'ul',
     { className: 'certification-list' },
@@ -19,9 +21,9 @@ export function ExperienceView() {
   );
 
   return createElement('section', { className: 'view view--experience' }, [
-    createElement('h1', {}, ['My Experience']),
-    ExperienceList(experience),
-    createElement('h2', {}, ['Certifications and courses']),
+    createElement('h1', {}, [t(locale, 'experience.title')]),
+    ExperienceList(experience, locale),
+    createElement('h2', {}, [t(locale, 'experience.certificationsTitle')]),
     certList,
   ]);
 }

@@ -26,13 +26,14 @@ terceiros.
 
 ```
 src/
-  index.html          Ponto de entrada HTML
+  index.html          Ponto de entrada HTML (header/footer são renderizados via JS)
   css/main.css        Estilos (mínimos, sem identidade visual ainda)
   js/
     main.js           Bootstrap da aplicação
     app.js            Registro de rotas + renderização (testável isoladamente)
     router/           Router baseado em hash, sem dependências
-    data/             Dados estáticos (projetos, experiência)
+    i18n/             Sistema de idiomas (PT/EN): estado, detecção, textos da UI
+    data/             Dados estáticos (projetos, experiência) — bilíngues
     components/       Funções que retornam elementos DOM (ProjectCard, etc.)
     views/            Composição de componentes por página
     utils/            Helpers de DOM (createElement, escapeHtml, ...)
@@ -55,6 +56,13 @@ docs/
 - **Dados em módulos JS, não JSON solto**: permite JSDoc tipado
   (`@typedef`) e validação em tempo de desenvolvimento, sem precisar de
   TypeScript.
+- **i18n sem lib externa**: idioma ativo em memória + `localStorage`, com
+  fallback para inglês em qualquer chave/idioma não encontrado
+  (`t(locale, path)` em `strings.js`, `getProjectTranslation()` em
+  `projects.js`). Suficiente para 2 idiomas sem justificar uma biblioteca.
+- **Header/footer renderizados via JS**: para reagirem à troca de idioma sem
+  duplicar lógica de template — `index.html` só define os containers
+  (`#site-header`, `#site-footer`, `#app`).
 
 ## Comandos
 
@@ -79,9 +87,10 @@ npm run validate       # lint + format:check + test — roda tudo, como no CI
 
 ## Testes
 
-Cobertura atual: **100%** em `src/js/` (exceto `main.js`, que é só bootstrap
-e não tem lógica a testar). Rodar `npm run test:coverage` gera relatório HTML
-em `coverage/index.html`.
+Cobertura atual: **100% statements/lines/funcs, ~97% branches** em
+`src/js/` (exceto `main.js`, que é só bootstrap e não tem lógica a testar).
+71 testes. Rodar `npm run test:coverage` gera relatório HTML em
+`coverage/index.html`.
 
 Convenção: cada arquivo em `src/js/**/*.js` tem um `.test.js`
 correspondente em `tests/`, testando comportamento observável (o que a
@@ -89,12 +98,14 @@ função retorna/renderiza), não detalhes de implementação.
 
 ## Performance
 
-- Bundle de produção atual: **~8.7 kB JS** (≈3.4 kB gzip), **~1.7 kB CSS**,
-  sem dependências de runtime.
+- Bundle de produção atual: **~49 kB JS** (≈17.6 kB gzip), **~2.5 kB CSS**,
+  sem dependências de runtime. O grosso do JS é conteúdo (os 6 case studies
+  completos em inglês embutidos como dados), não código.
 - `chunkSizeWarningLimit` no Vite está propositalmente baixo (150 kB) para
   avisar cedo se algo inflar o bundle.
-- Imagens usam `loading="lazy"` e `decoding="async"` por padrão nos cards de
-  projeto.
+- Sem imagens reais ainda: projetos usam um placeholder visual leve
+  (`ImagePlaceholder.js`, puro CSS) em vez de arquivos de imagem — ver
+  `docs/content-migration.md`.
 
 ## Deploy
 

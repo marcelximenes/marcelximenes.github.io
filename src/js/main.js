@@ -6,5 +6,9 @@ if (!rootElement) {
   throw new Error('Root element #app not found in the document.');
 }
 
-const router = createApp(rootElement);
+const router = createApp(rootElement, {
+  header: document.getElementById('site-header'),
+  footer: document.getElementById('site-footer'),
+});
+
 router.start();
