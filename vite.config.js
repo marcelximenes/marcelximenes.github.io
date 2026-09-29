@@ -3,6 +3,8 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   root: 'src',
   publicDir: '../public',
+  // Domínio raiz do GitHub Pages (marcelximenes.github.io) — sem subpasta.
+  base: '/',
   build: {
     outDir: '../dist',
     emptyOutDir: true,

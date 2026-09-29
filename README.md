@@ -98,8 +98,17 @@ função retorna/renderiza), não detalhes de implementação.
 
 ## Deploy
 
-Como o roteamento é em hash (`#/...`), qualquer host estático serve `dist/`
-sem configuração adicional de rewrites.
+Publicado no **GitHub Pages** via GitHub Actions
+(`.github/workflows/deploy.yml`): todo push em `main` builda o projeto e
+publica `dist/` automaticamente. Não precisa rodar nada manualmente.
+
+URL: `https://marcelximenes.github.io/`
+
+Pré-requisito único (feito uma vez, pelo GitHub): em Settings → Pages,
+"Source" deve estar como **GitHub Actions** (não "Deploy from a branch").
+
+Como o roteamento é em hash (`#/...`), não é preciso configurar rewrites —
+funciona igual em qualquer host estático.
 
 ## Estado do conteúdo
 
