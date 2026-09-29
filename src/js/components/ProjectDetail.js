@@ -22,7 +22,9 @@ export function ProjectDetail(project, locale) {
     translation.summary,
   ]);
 
-  const cover = ImagePlaceholder(translation.title, t(locale, 'project.imagePlaceholder'));
+  const cover = createElement('div', { className: 'project-detail__cover' }, [
+    ImagePlaceholder(translation.title, t(locale, 'project.imagePlaceholder')),
+  ]);
 
   const sections =
     translation.sections.length > 0
@@ -44,9 +46,8 @@ export function ProjectDetail(project, locale) {
 
   return createElement('article', { className: 'project-detail' }, [
     backLink,
-    title,
-    summary,
     cover,
+    createElement('div', { className: 'project-detail__intro' }, [title, summary]),
     createElement('div', { className: 'project-detail__body' }, sections),
   ]);
 }

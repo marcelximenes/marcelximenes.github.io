@@ -44,10 +44,17 @@ describe('ProjectCard', () => {
     expect(link.getAttribute('href')).toBe('#/project/volvo');
   });
 
-  it('uses the localized "see more" label', () => {
+  it('uses the localized "see more" label in the accessible name', () => {
     const card = ProjectCard(sampleProject, 'pt');
     const link = card.querySelector('.project-card__link');
-    expect(link.textContent).toBe('Ver mais...');
+    expect(link.getAttribute('aria-label')).toBe('Volvo Bank — Ver mais...');
+  });
+
+  it('wraps the image and caption in a single clickable link (whole card is the target)', () => {
+    const card = ProjectCard(sampleProject, 'en');
+    const link = card.querySelector('.project-card__link');
+    expect(link.querySelector('.image-placeholder')).not.toBeNull();
+    expect(link.querySelector('.project-card__title')).not.toBeNull();
   });
 
   it('renders an image placeholder instead of a real image', () => {

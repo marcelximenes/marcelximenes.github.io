@@ -5,7 +5,11 @@ import { createElement } from '../utils/dom.js';
 import { ImagePlaceholder } from './ImagePlaceholder.js';
 
 /**
- * Cria o elemento de card de um projeto para a listagem da home.
+ * Cria o tile de um projeto para o carrossel da home: um painel único,
+ * clicável, com a imagem (placeholder por enquanto) preenchendo o tile e
+ * o título/resumo sobrepostos na base. A mesma proporção de imagem é
+ * reaproveitada na capa do case study (ProjectDetail) para que abrir um
+ * projeto pareça uma continuação do tile, não uma página diferente.
  * @param {import('../data/projects.js').Project} project
  * @param {string} locale
  * @returns {HTMLElement}
@@ -15,15 +19,19 @@ export function ProjectCard(project, locale) {
 
   const image = ImagePlaceholder(translation.title, t(locale, 'project.imagePlaceholder'));
 
-  const title = createElement('h3', { className: 'project-card__title' }, [translation.title]);
-  const summary = createElement('p', { className: 'project-card__summary' }, [translation.summary]);
+  const caption = createElement('div', { className: 'project-card__caption' }, [
+    createElement('h3', { className: 'project-card__title' }, [translation.title]),
+    createElement('p', { className: 'project-card__summary' }, [translation.summary]),
+  ]);
+
   const link = createElement(
     'a',
     {
       className: 'project-card__link',
       href: `#/project/${project.id}`,
+      'aria-label': `${translation.title} — ${t(locale, 'project.seeMore')}`,
     },
-    [t(locale, 'project.seeMore')],
+    [image, caption],
   );
 
   return createElement(
@@ -32,6 +40,6 @@ export function ProjectCard(project, locale) {
       className: 'project-card',
       dataset: { projectId: project.id },
     },
-    [image, title, summary, link],
+    [link],
   );
 }
