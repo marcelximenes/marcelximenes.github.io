@@ -48,6 +48,11 @@ export const strings = {
     languageSwitch: {
       label: 'Language',
     },
+    layoutToggle: {
+      label: 'Projects layout',
+      carousel: 'Carousel view',
+      grid: 'Grid view',
+    },
     contactModal: {
       title: 'Work with me!',
       description: "Tell me a bit about you and I'll get back to you shortly.",
@@ -105,6 +110,11 @@ export const strings = {
     },
     languageSwitch: {
       label: 'Idioma',
+    },
+    layoutToggle: {
+      label: 'Layout dos projetos',
+      carousel: 'Ver em carrossel',
+      grid: 'Ver em grade',
     },
     contactModal: {
       title: 'Work with me!',

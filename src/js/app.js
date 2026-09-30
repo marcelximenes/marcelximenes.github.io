@@ -1,6 +1,7 @@
 import { ContactModal } from './components/ContactModal.js';
 import { SiteFooter } from './components/SiteFooter.js';
 import { SiteHeader } from './components/SiteHeader.js';
+import { getProjectById } from './data/projects.js';
 import { getLocale, initLocale, onLocaleChange } from './i18n/i18n.js';
 import { Router } from './router/router.js';
 import { clearElement } from './utils/dom.js';
@@ -83,14 +84,33 @@ export function createApp(rootElement, chrome = {}) {
     renderView();
   }
 
+  /**
+   * Home e projeto aberto são a mesma view: navegar entre `#/` e
+   * `#/project/:id` reaproveita a home já na tela (só abre/fecha/troca o
+   * painel), o que permite animar a imagem do tile até o painel e de volta.
+   * @param {string | null} [id]
+   */
+  function showHome(id = null) {
+    currentViewFactory = (locale) => HomeView(locale, id);
+    const existing = rootElement.querySelector(':scope > .view--home');
+
+    if (existing && typeof existing.setSelectedProject === 'function') {
+      document.body.classList.toggle('is-project-open', Boolean(id && getProjectById(id)));
+      existing.setSelectedProject(id);
+      return;
+    }
+
+    renderView();
+  }
+
   const router = new Router();
 
   router
-    .register('/', () => render((locale) => HomeView(locale)))
-    .register('/project/:id', ({ id }) => render((locale) => HomeView(locale, id)))
+    .register('/', () => showHome())
+    .register('/project/:id', ({ id }) => showHome(id))
     .register('/experience', () => render((locale) => ExperienceView(locale)))
     .register('/testimonials', () => render((locale) => TestimonialsView(locale)))
-    .notFound(() => render((locale) => HomeView(locale)));
+    .notFound(() => showHome());
 
   renderChrome();
 

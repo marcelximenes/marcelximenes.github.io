@@ -26,9 +26,15 @@
   --tile-w: min(66.3vw, calc((100vh - 260px) * 1.626));
   --tile-gap: 4.6vw;
   --tile-radius: 30px;
+  /* Margem lateral da página (mesma do header). */
+  --edge: 57px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.2, 1);
 
   /* Modal de projeto: 949px de 1300px, topo a 142px de 924px. */
-  --modal-w: min(73vw, 1100px);
+  /* Painel mais largo que a referência (949px/73vw), a pedido. */
+  --modal-w: min(88vw, 1480px);
   --modal-top: 15.4vh;
   --modal-radius: 64px;
 }
@@ -254,16 +260,20 @@ main:has(> .view--home) {
   padding-top: 36px;
 }
 
-/* ---------- Carrossel da home ---------- */
+/* ---------- Projetos da home: carrossel e grade ---------- */
 
 .project-carousel__track {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--tile-gap);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
+  scroll-padding-inline-start: var(--edge);
   scrollbar-width: none;
-  padding: 60px calc(50vw - var(--tile-w) / 2);
+  /* Primeiro projeto encosta na margem da página (não centralizado); a
+     sobra à direita deixa o último também chegar ao início. */
+  padding: 60px calc(100vw - var(--tile-w) - var(--edge)) 60px var(--edge);
   margin: -60px 0;
 }
 
@@ -275,42 +285,49 @@ main:has(> .view--home) {
   position: relative;
   flex: 0 0 var(--tile-w);
   aspect-ratio: 862 / 530;
+  scroll-snap-align: start;
+  /* Tipografia do tile em cqw: escala junto com o tile, do carrossel
+     (862px) à grade (~380px). */
+  container-type: inline-size;
+}
+
+.project-card__link {
+  position: absolute;
+  inset: 0;
+  display: block;
   border-radius: var(--tile-radius);
   overflow: hidden;
-  scroll-snap-align: center;
-  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  color: #fff;
+  text-decoration: none;
+  transition: transform 0.9s var(--ease-out);
 }
 
-/* Vizinhos: 460px de altura contra 530px do ativo (≈ 0.867), ancorados
-   na borda voltada para o card ativo. */
-.project-card.is-before {
-  transform: scale(0.867);
-  transform-origin: right center;
-}
-
-.project-card.is-after {
-  transform: scale(0.867);
-  transform-origin: left center;
-}
-
-/* Com o modal aberto os vizinhos crescem (≈ 592px de altura). */
-.is-project-open .project-card.is-before,
-.is-project-open .project-card.is-after {
-  transform: translateY(20px) scale(1.117);
-}
-
-.project-card:has(.project-card__link:focus-visible) {
+.project-card__link:focus-visible {
   outline: 3px solid #fff;
   outline-offset: 4px;
 }
 
-.project-card__link {
-  position: relative;
-  display: block;
-  height: 100%;
-  color: #fff;
-  text-decoration: none;
-  outline: none;
+/* Vizinhos: 460px de altura contra 530px do ativo (≈ 0.867), ancorados
+   na borda voltada para o card ativo. */
+.project-card.is-before .project-card__link {
+  transform: scale(0.867);
+  transform-origin: right center;
+}
+
+.project-card.is-after .project-card__link {
+  transform: scale(0.867);
+  transform-origin: left center;
+}
+
+/* Com o painel aberto, os vizinhos do carrossel crescem por trás dele. */
+.is-project-open .project-carousel:not(.is-grid) .project-card.is-before .project-card__link,
+.is-project-open .project-carousel:not(.is-grid) .project-card.is-after .project-card__link {
+  transform: translateY(20px) scale(1.117);
+}
+
+/* Enquanto a imagem "voa" para o painel (ou volta), o tile fica vazio. */
+.project-card.is-flying .project-card__link {
+  visibility: hidden;
 }
 
 .project-card__link::after {
@@ -327,6 +344,11 @@ main:has(> .view--home) {
   inset: 0;
   height: 100%;
   border-radius: 0;
+  transition: transform 1.2s var(--ease-out);
+}
+
+.project-card__link:hover .image-placeholder {
+  transform: scale(1.04);
 }
 
 /* Legenda: título a 68px e texto a 59px da base, num tile de 862px. */
@@ -334,20 +356,25 @@ main:has(> .view--home) {
   position: absolute;
   inset: auto 20% 0 0;
   z-index: 1;
-  padding: 0 0 6.8% 7.9%;
+  padding: 0 0 6.8cqw 7.9cqw;
+  transition: transform 0.9s var(--ease-out);
+}
+
+.project-card__link:hover .project-card__caption {
+  transform: translateY(-6px);
 }
 
 .project-card__title {
   margin: 0;
-  font-size: clamp(20px, 2.15vw, 34px);
+  font-size: max(15px, 3.25cqw);
   font-weight: 400;
   line-height: 1.25;
 }
 
 .project-card__summary {
-  margin: clamp(10px, 1.3vw, 20px) 0 0;
+  margin: max(6px, 2.3cqw) 0 0;
   max-width: 520px;
-  font-size: clamp(14px, 1.385vw, 21px);
+  font-size: max(12px, 2.09cqw);
   font-weight: 300;
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.78);
@@ -356,10 +383,10 @@ main:has(> .view--home) {
 /* Botão de seta: círculo preto de 51px, 25px da direita, 48px da base. */
 .project-card__arrow {
   position: absolute;
-  right: 2.9%;
-  bottom: 9.1%;
+  right: 2.9cqw;
+  bottom: 5.6cqw;
   z-index: 1;
-  width: clamp(40px, 3.92vw, 60px);
+  width: max(34px, 5.9cqw);
   aspect-ratio: 1;
   display: inline-flex;
   align-items: center;
@@ -367,19 +394,115 @@ main:has(> .view--home) {
   border-radius: 50%;
   background: #000;
   color: #fff;
+  transition:
+    transform 0.6s var(--ease-out),
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.project-card__link:hover .project-card__arrow {
+  transform: scale(1.14);
+  background: #fff;
+  color: #000;
 }
 
 .project-card__arrow svg {
   width: 36%;
   height: 36%;
+  transition: transform 0.6s var(--ease-out);
+}
+
+.project-card__link:hover .project-card__arrow svg {
+  transform: translateX(2px);
+}
+
+/* Grade: 3 colunas (2 em telas médias, 1 no celular), rolando a página. */
+.view--home.is-grid {
+  justify-content: flex-start;
+  padding: 130px 0 150px;
+}
+
+.project-carousel.is-grid .project-carousel__track {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px;
+  overflow: visible;
+  scroll-snap-type: none;
+  padding: 0 var(--edge);
+  margin: 0;
+}
+
+.project-carousel.is-grid .project-card {
+  width: auto;
+}
+
+.project-carousel.is-grid .project-card__link {
+  transform: none;
+}
+
+@media (max-width: 1024px) {
+  .project-carousel.is-grid .project-carousel__track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Alternador carrossel/grade, embaixo e ao centro. */
+.layout-toggle {
+  position: fixed;
+  left: 50%;
+  bottom: 36px;
+  z-index: 150;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(54, 54, 54, 0.75);
+  backdrop-filter: blur(12px);
+  transform: translateX(-50%);
+  transition:
+    opacity 0.5s ease,
+    transform 0.7s var(--ease-out);
+}
+
+.is-project-open .layout-toggle {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 24px);
+}
+
+.layout-toggle__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.layout-toggle__option:hover {
+  color: var(--text);
+}
+
+.layout-toggle__option[aria-pressed='true'] {
+  background: #fff;
+  color: #111;
 }
 
 /* ---------- Placeholder de imagem (gradientes provisórios) ---------- */
 
+/* O gradiente vem de --art (definido pelo JS a partir de
+   art/placeholderArt.js, a mesma fonte das texturas do WebGL). */
 .image-placeholder {
   display: block;
   width: 100%;
-  background-color: #3d3a7a;
+  background: var(--art, #3d3a7a);
 }
 
 .image-placeholder__label,
@@ -392,29 +515,28 @@ main:has(> .view--home) {
   white-space: nowrap;
 }
 
-.image-placeholder--v0 {
-  background:
-    radial-gradient(60% 80% at 15% 20%, rgba(90, 170, 240, 0.55), transparent 70%),
-    radial-gradient(50% 60% at 60% 60%, rgba(150, 40, 230, 0.55), transparent 70%),
-    linear-gradient(135deg, #5a6cc4 0%, #7c7fcf 55%, #8a7cc9 100%);
+/* Com o WebGL ligado, quem desenha a imagem dos tiles é o canvas (com a
+   deformação); o DOM fica só com legenda, seta e sombra. */
+.has-flowmap .project-card .image-placeholder {
+  background: transparent;
 }
 
-.image-placeholder--v1 {
-  background:
-    radial-gradient(90% 70% at 10% 95%, rgba(170, 80, 190, 0.6), transparent 70%),
-    linear-gradient(165deg, #1c0036 0%, #2c0c55 45%, #4f3584 75%, #3a2266 100%);
+.flowmap-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
 }
 
-.image-placeholder--v2 {
-  background:
-    radial-gradient(80% 60% at 85% 80%, rgba(210, 110, 220, 0.55), transparent 70%),
-    linear-gradient(200deg, #1f0840 0%, #5b2a96 55%, #8d55c4 100%);
-}
-
-.image-placeholder--v3 {
-  background:
-    radial-gradient(70% 70% at 20% 30%, rgba(120, 190, 255, 0.5), transparent 70%),
-    linear-gradient(140deg, #1b2a6b 0%, #3f5fc4 55%, #7d8fe0 100%);
+/* Cópia da imagem que voa entre o tile e o painel. */
+.project-flyer {
+  position: fixed;
+  z-index: 120;
+  margin: 0;
+  pointer-events: none;
+  will-change: left, top, width, height;
 }
 
 /* ---------- Modal de projeto (painel branco) ---------- */
@@ -587,6 +709,7 @@ main:has(> .view--home) {
 @media (max-width: 720px) {
   :root {
     --tile-w: 84vw;
+    --edge: 20px;
     --modal-w: 100vw;
     --modal-radius: 32px;
   }
@@ -618,9 +741,85 @@ main:has(> .view--home) {
   .project-modal__nav {
     display: none;
   }
+
+  .project-carousel.is-grid .project-carousel__track {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* ---------- Cursor (luva) ---------- */
+
+.has-custom-cursor,
+.has-custom-cursor * {
+  cursor: none !important;
+}
+
+.has-custom-cursor input,
+.has-custom-cursor textarea {
+  cursor: text !important;
+}
+
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.cursor__swing {
+  transform-origin: 14.5px 1.3px;
+}
+
+.cursor__hand {
+  transform-origin: 14.5px 1.3px;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.35));
+  transition:
+    transform 0.45s var(--ease-out),
+    opacity 0.25s ease;
+}
+
+.cursor__svg {
+  display: block;
+}
+
+.cursor.is-hidden .cursor__hand {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.cursor.is-hover .cursor__hand {
+  transform: scale(1.18) rotate(-12deg);
+}
+
+.cursor.is-down .cursor__hand {
+  transform: scale(0.86) rotate(-4deg);
+  transition-duration: 0.12s;
 }
 
 /* ---------- Outras páginas ---------- */
+
+.view:not(.view--home) {
+  animation: view-in 0.9s var(--ease-out) both;
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 .view--experience h1,
 .view--testimonials h1 {

@@ -1,4 +1,6 @@
 import { createApp } from './app.js';
+import { initCursor } from './effects/cursor.js';
+import { initFlowmap } from './effects/flowmap.js';
 
 const rootElement = document.getElementById('app');
 
@@ -12,3 +14,8 @@ const router = createApp(rootElement, {
 });
 
 router.start();
+
+// Camadas puramente visuais (WebGL e cursor): ligadas só no navegador
+// real, fora do app — cada uma desliga sozinha se não tiver suporte.
+initFlowmap();
+initCursor();

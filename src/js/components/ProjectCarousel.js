@@ -4,10 +4,9 @@ import { createElement } from '../utils/dom.js';
 import { ProjectCard } from './ProjectCard.js';
 
 /**
- * Marca qual card é o ativo (centralizado, em tamanho cheio) e quais
- * ficam antes/depois dele — o CSS usa essas classes para reduzir os
- * vizinhos e ancorá-los na borda voltada para o card ativo, como na
- * referência visual (vizinhos menores "espiando" nas bordas da tela).
+ * Marca qual card é o ativo (alinhado no início da tela, em tamanho
+ * cheio) e quais ficam antes/depois dele — o CSS usa essas classes para
+ * reduzir os vizinhos, como na referência visual.
  * @param {HTMLElement[]} cards
  * @param {number} activeIndex
  */
@@ -20,13 +19,23 @@ function applyActiveState(cards, activeIndex) {
 }
 
 /**
- * Rola a trilha para que o card fique centralizado na tela.
+ * Recuo inicial da trilha (onde o card ativo encosta).
+ * @param {HTMLElement} track
+ * @returns {number}
+ */
+function startInset(track) {
+  return parseFloat(window.getComputedStyle(track).paddingLeft) || 0;
+}
+
+/**
+ * Rola a trilha para que o card fique alinhado no início (primeiro
+ * projeto começa encostado na margem da página, não centralizado).
  * @param {HTMLElement} track
  * @param {HTMLElement} card
  * @param {ScrollBehavior} behavior
  */
-function centerCard(track, card, behavior) {
-  const left = card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2;
+function alignCard(track, card, behavior) {
+  const left = Math.max(card.offsetLeft - startInset(track), 0);
   if (typeof track.scrollTo === 'function') {
     track.scrollTo({ left, behavior });
   } else {
@@ -35,17 +44,17 @@ function centerCard(track, card, behavior) {
 }
 
 /**
- * Índice do card cujo centro está mais próximo do centro da trilha.
+ * Índice do card mais próximo da posição de início da trilha.
  * @param {HTMLElement} track
  * @param {HTMLElement[]} cards
  * @returns {number}
  */
-function findCenteredIndex(track, cards) {
-  const trackCenter = track.scrollLeft + track.clientWidth / 2;
+function findAlignedIndex(track, cards) {
+  const start = track.scrollLeft + startInset(track);
   let bestIndex = 0;
   let bestDistance = Infinity;
   cards.forEach((card, index) => {
-    const distance = Math.abs(card.offsetLeft + card.offsetWidth / 2 - trackCenter);
+    const distance = Math.abs(card.offsetLeft - start);
     if (distance < bestDistance) {
       bestDistance = distance;
       bestIndex = index;
@@ -55,27 +64,40 @@ function findCenteredIndex(track, cards) {
 }
 
 /**
- * Renderiza os projetos como um carrossel horizontal: um card ativo
- * grande no centro e os vizinhos menores nas bordas. Setas esquerda/
- * direita movem o foco (e o card ativo); Enter ou clique abre o projeto.
+ * Renderiza os projetos em carrossel horizontal (card ativo grande no
+ * início, vizinhos menores à direita) ou em grade. Setas esquerda/direita
+ * movem o foco (e o card ativo); Enter ou clique abre o projeto.
+ *
+ * O elemento retornado expõe uma pequena API usada pela HomeView:
+ * `setActiveProject(id, behavior)`, `getCard(id)`, `getCards()` e
+ * `setLayout('carousel' | 'grid')`.
  * @param {import('../data/projects.js').Project[]} projects
  * @param {string} locale
  * @param {Object} [options]
- * @param {string | null} [options.activeProjectId] - Projeto a centralizar
- *   inicialmente (ex: o projeto aberto no modal, para que os vizinhos
- *   dele apareçam nas bordas por trás do modal).
+ * @param {string | null} [options.activeProjectId] - Projeto ativo inicial
+ *   (ex: o projeto aberto no modal).
+ * @param {'carousel' | 'grid'} [options.layout]
  * @returns {HTMLElement}
  */
-export function ProjectCarousel(projects, locale, { activeProjectId = null } = {}) {
-  const cards = projects.map((project) => ProjectCard(project, locale));
+export function ProjectCarousel(
+  projects,
+  locale,
+  { activeProjectId = null, layout = 'carousel' } = {},
+) {
+  const cards = projects.map((project, index) => {
+    const card = ProjectCard(project, locale);
+    card.style.setProperty('--i', String(index));
+    return card;
+  });
   const track = createElement('div', { className: 'project-carousel__track' }, cards);
 
-  const initialIndex = Math.max(
+  let activeIndex = Math.max(
     projects.findIndex((project) => project.id === activeProjectId),
     0,
   );
-  let activeIndex = initialIndex;
   applyActiveState(cards, activeIndex);
+
+  const isGrid = () => carousel.classList.contains('is-grid');
 
   function setActive(index) {
     activeIndex = index;
@@ -99,17 +121,22 @@ export function ProjectCarousel(projects, locale, { activeProjectId = null } = {
 
     event.preventDefault();
     setActive(nextIndex);
-    links[nextIndex].focus({ preventScroll: true });
-    centerCard(track, cards[nextIndex], 'smooth');
+    links[nextIndex].focus({ preventScroll: !isGrid() });
+    if (!isGrid()) {
+      alignCard(track, cards[nextIndex], 'smooth');
+    }
   }
 
   // Ao rolar manualmente (trackpad, arrastar, toque), o card mais próximo
-  // do centro vira o ativo quando a rolagem assenta.
+  // do início vira o ativo quando a rolagem assenta.
   let scrollTimer = null;
   track.addEventListener('scroll', () => {
+    if (isGrid()) {
+      return;
+    }
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(() => {
-      const index = findCenteredIndex(track, cards);
+      const index = findAlignedIndex(track, cards);
       if (index !== activeIndex) {
         setActive(index);
       }
@@ -119,7 +146,7 @@ export function ProjectCarousel(projects, locale, { activeProjectId = null } = {
   const carousel = createElement(
     'div',
     {
-      className: 'project-carousel',
+      className: `project-carousel${layout === 'grid' ? ' is-grid' : ''}`,
       role: 'region',
       'aria-roledescription': 'carousel',
       'aria-label': t(locale, 'project.carouselLabel'),
@@ -128,12 +155,31 @@ export function ProjectCarousel(projects, locale, { activeProjectId = null } = {
     [track],
   );
 
-  // Centraliza o card inicial assim que o carrossel estiver no DOM
-  // (antes disso não há medidas de layout).
+  carousel.getCards = () => cards;
+  carousel.getCard = (id) => cards.find((card) => card.dataset.projectId === id) ?? null;
+  carousel.setActiveProject = (id, behavior = 'smooth') => {
+    const index = projects.findIndex((project) => project.id === id);
+    if (index === -1) {
+      return;
+    }
+    setActive(index);
+    if (!isGrid()) {
+      alignCard(track, cards[index], behavior);
+    }
+  };
+  carousel.setLayout = (mode) => {
+    carousel.classList.toggle('is-grid', mode === 'grid');
+    if (mode !== 'grid') {
+      alignCard(track, cards[activeIndex], 'instant');
+    }
+  };
+
+  // Alinha o card inicial assim que o carrossel estiver no DOM (antes
+  // disso não há medidas de layout).
   const nextFrame = window.requestAnimationFrame ?? ((callback) => setTimeout(callback, 0));
   nextFrame(() => {
-    if (track.isConnected) {
-      centerCard(track, cards[activeIndex], 'instant');
+    if (track.isConnected && !isGrid()) {
+      alignCard(track, cards[activeIndex], 'instant');
     }
   });
 

@@ -1,6 +1,7 @@
+import { ART_VARIANTS, artToCss } from '../art/placeholderArt.js';
 import { createElement } from '../utils/dom.js';
 
-const VARIANT_COUNT = 4;
+const VARIANT_COUNT = ART_VARIANTS.length;
 
 /**
  * Escolhe, de forma determinística, uma das variações de gradiente do
@@ -28,16 +29,20 @@ export function placeholderVariant(id) {
  * @returns {HTMLElement}
  */
 export function ImagePlaceholder(label, caption, variant = 0) {
-  return createElement(
+  const normalized = variant % VARIANT_COUNT;
+  const element = createElement(
     'div',
     {
-      className: `image-placeholder image-placeholder--v${variant % VARIANT_COUNT}`,
+      className: `image-placeholder image-placeholder--v${normalized}`,
       role: 'img',
       'aria-label': label,
+      dataset: { variant: String(normalized) },
     },
     [
       createElement('span', { className: 'image-placeholder__label' }, [label]),
       createElement('span', { className: 'image-placeholder__caption' }, [caption]),
     ],
   );
+  element.style.setProperty('--art', artToCss(normalized));
+  return element;
 }

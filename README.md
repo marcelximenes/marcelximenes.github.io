@@ -91,6 +91,31 @@ docs/
   como no print; o carrossel começa no primeiro projeto (sem vizinho à
   esquerda na primeira tela); as "imagens" ainda são gradientes
   provisórios até existirem imagens reais.
+- **Animações sem biblioteca** (`js/motion/`): Web Animations API
+  (`element.animate`). Abrir um projeto é uma transição de "elemento
+  compartilhado": a imagem do tile encolhe e voa até o lugar da capa
+  enquanto o painel branco se revela por trás dela (clip-path) e o texto
+  entra em sequência; fechar faz o caminho inverso; anterior/próximo troca
+  o conteúdo com o painel aberto. Para isso, `#/` e `#/project/:id`
+  reaproveitam a mesma HomeView (`setSelectedProject`) em vez de recriá-la.
+  Carrossel ↔ grade usa FLIP. Sem a API (jsdom) ou com "reduzir
+  movimento" no sistema, tudo acontece na hora — mesmo estado final.
+- **Flowmap em WebGL puro** (`js/effects/flowmap.js`): deformação
+  líquida seguindo o mouse no fundo e nas imagens da home, inspirada na
+  demo FlowmapDeformation do Codrops, escrita do zero (sem three.js/OGL,
+  mantendo zero dependências de runtime). Um canvas fixo atrás da página
+  desenha as imagens dos tiles nas posições lidas do DOM a cada quadro.
+  As capas provisórias são descritas como dados (`js/art/placeholderArt.js`)
+  e viram tanto o CSS quanto a textura do WebGL — as duas versões são
+  idênticas. Sem WebGL, fica o gradiente em CSS.
+- **Cursor de luva** (`js/effects/cursor.js`): luva branca de desenho
+  animado, **desenho original** em SVG (não é a luva do Mickey, que é
+  elemento de personagem da Disney), com suavização, balanço pela
+  velocidade, aumento sobre links e "aperto" no clique. Só com mouse; em
+  campos de texto volta o cursor nativo.
+- **Home em carrossel ou grade** (`LayoutToggle`, escolha salva no
+  navegador): no carrossel o primeiro projeto começa encostado na margem
+  da página; na grade, 3/2/1 colunas conforme a largura.
 - **Metadado "Client" no case study, sem "Year"**: o modal de projeto
   agora exibe um campo "Client" (`project.client` em `data/projects.js`)
   quando o nome da instituição já está explícito no texto do case study.
@@ -142,8 +167,8 @@ npm run validate       # lint + format:check + test — roda tudo, como no CI
 ## Testes
 
 Cobertura atual: **~100% statements/lines/funcs, ~97% branches** em
-`src/js/` (exceto `main.js`, que é só bootstrap e não tem lógica a testar).
-123 testes. Rodar `npm run test:coverage` gera relatório HTML em
+`src/js/` (exceto `main.js`, que é só bootstrap, e `effects/`, camadas WebGL/cursor que o jsdom não executa — verificadas num Chromium real).
+149 testes. Rodar `npm run test:coverage` gera relatório HTML em
 `coverage/index.html`.
 
 Convenção: cada arquivo em `src/js/**/*.js` tem um `.test.js`
@@ -152,7 +177,7 @@ função retorna/renderiza), não detalhes de implementação.
 
 ## Performance
 
-- Bundle de produção atual: **~60 kB JS** (≈21 kB gzip), **~2.5 kB CSS**,
+- Bundle de produção atual: **~89 kB JS** (≈31 kB gzip), **~13 kB CSS**,
   sem dependências de runtime. O grosso do JS é conteúdo (os 8 case studies
   completos em inglês embutidos como dados), não código.
 - `chunkSizeWarningLimit` no Vite está propositalmente baixo (150 kB) para
