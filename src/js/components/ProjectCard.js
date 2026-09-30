@@ -3,7 +3,7 @@ import { t } from '../i18n/strings.js';
 import { createElement } from '../utils/dom.js';
 
 import { ArrowRightIcon } from './icons.js';
-import { ImagePlaceholder } from './ImagePlaceholder.js';
+import { ImagePlaceholder, placeholderVariant } from './ImagePlaceholder.js';
 
 /**
  * Cria o tile de um projeto para o carrossel da home: um painel único,
@@ -18,7 +18,11 @@ import { ImagePlaceholder } from './ImagePlaceholder.js';
 export function ProjectCard(project, locale) {
   const translation = getProjectTranslation(project, locale);
 
-  const image = ImagePlaceholder(translation.title, t(locale, 'project.imagePlaceholder'));
+  const image = ImagePlaceholder(
+    translation.title,
+    t(locale, 'project.imagePlaceholder'),
+    placeholderVariant(project.id),
+  );
 
   const caption = createElement('div', { className: 'project-card__caption' }, [
     createElement('h3', { className: 'project-card__title' }, [translation.title]),

@@ -66,6 +66,10 @@ export function createApp(rootElement, chrome = {}) {
     rootElement.append(currentViewFactory(getLocale()));
 
     const modal = rootElement.querySelector('.project-modal');
+    // Com um projeto aberto, header/rodapé mudam de estado (CTA sem
+    // pílula, rodapé com Experience/Contact visível) e a página por trás
+    // não rola — como na referência visual do modal.
+    document.body.classList.toggle('is-project-open', Boolean(modal));
     if (modal) {
       modal.focus();
     } else {

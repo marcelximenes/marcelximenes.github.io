@@ -63,6 +63,13 @@ describe('ProjectCard', () => {
     expect(card.querySelector('img')).toBeNull();
   });
 
+  it('gives the placeholder a stable gradient variant derived from the project id', () => {
+    const first = ProjectCard(sampleProject, 'en').querySelector('.image-placeholder');
+    const second = ProjectCard(sampleProject, 'pt').querySelector('.image-placeholder');
+    expect(first.className).toMatch(/image-placeholder--v[0-3]/);
+    expect(first.className).toBe(second.className);
+  });
+
   it('sets the project id as a data attribute', () => {
     const card = ProjectCard(sampleProject, 'en');
     expect(card.dataset.projectId).toBe('volvo');

@@ -78,6 +78,19 @@ docs/
   para Experience e Contato foram movidos para um rodapé fixo nos cantos
   inferiores da tela (`SiteFooter`), visível em qualquer rota — inclusive
   com o modal de projeto aberto por cima.
+- **Medidas da home e do modal vêm das referências visuais**: os prints
+  de referência (frame de 1300px) foram medidos pixel a pixel e convertidos
+  em unidades relativas — tile central 862×530 (66.3vw, raio 30px),
+  vizinhos a ~0.867 de escala ancorados na borda do tile ativo; painel
+  branco 949px (73vw), topo a 142px, raio 64px; dentro dele, `cqw`
+  (container queries) para manter as proporções de coluna/imagem em
+  qualquer largura. Fonte: Poppins (Google Fonts), fundo `#222`.
+  Decisões que **não** estão nos prints (suposições, podem divergir do
+  que você quer): o seletor EN/PT continua no header, discreto; o rodapé
+  (Experience/Contact) só aparece com um projeto aberto ou fora da home,
+  como no print; o carrossel começa no primeiro projeto (sem vizinho à
+  esquerda na primeira tela); as "imagens" ainda são gradientes
+  provisórios até existirem imagens reais.
 - **Metadado "Client" no case study, sem "Year"**: o modal de projeto
   agora exibe um campo "Client" (`project.client` em `data/projects.js`)
   quando o nome da instituição já está explícito no texto do case study.
@@ -130,7 +143,7 @@ npm run validate       # lint + format:check + test — roda tudo, como no CI
 
 Cobertura atual: **~100% statements/lines/funcs, ~97% branches** em
 `src/js/` (exceto `main.js`, que é só bootstrap e não tem lógica a testar).
-115 testes. Rodar `npm run test:coverage` gera relatório HTML em
+123 testes. Rodar `npm run test:coverage` gera relatório HTML em
 `coverage/index.html`.
 
 Convenção: cada arquivo em `src/js/**/*.js` tem um `.test.js`

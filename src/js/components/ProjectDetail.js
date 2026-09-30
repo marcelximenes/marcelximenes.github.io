@@ -2,7 +2,7 @@ import { getProjectTranslation } from '../data/projects.js';
 import { t } from '../i18n/strings.js';
 import { createElement } from '../utils/dom.js';
 
-import { ImagePlaceholder } from './ImagePlaceholder.js';
+import { ImagePlaceholder, placeholderVariant } from './ImagePlaceholder.js';
 
 /**
  * Renderiza a lista de metadados do projeto (ex: "Client"), no formato
@@ -63,7 +63,11 @@ export function ProjectDetail(project, locale) {
   );
 
   const cover = createElement('div', { className: 'project-detail__cover' }, [
-    ImagePlaceholder(translation.title, t(locale, 'project.imagePlaceholder')),
+    ImagePlaceholder(
+      translation.title,
+      t(locale, 'project.imagePlaceholder'),
+      placeholderVariant(project.id),
+    ),
   ]);
 
   const sections =

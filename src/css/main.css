@@ -1,7 +1,8 @@
 /*
- * CSS mínimo, sem identidade visual definida — apenas o necessário para
- * layout legível e responsivo enquanto a estrutura técnica é validada.
- * A etapa de identidade visual/design system fica para uma fase futura.
+ * Estilos do portfólio. Medidas da home e do modal de projeto tiradas
+ * das referências visuais (frame de 1300px de largura) e convertidas em
+ * vw / cqw para escalar com a tela. Ex: tile central = 862px de 1300px
+ * → 66.3vw; modal = 949px → 73vw.
  */
 
 *,
@@ -11,23 +12,44 @@
 }
 
 :root {
-  --bg: #0a0a0a;
-  --surface: #161616;
-  --border: #2a2a2a;
-  --text: #f5f5f5;
+  --bg: #222222;
+  --surface: #363636;
+  --border: #3a3a3a;
+  --text: #ffffff;
   --text-muted: #9a9a9a;
+  --ink: #1c1c1c;
+  --ink-muted: #808080;
+  --rule: #b3b3b3;
+
+  /* Tile da home: 862×530 em 1300px de largura, limitado pela altura. */
+  --tile-ratio: 1.626;
+  --tile-w: min(66.3vw, calc((100vh - 260px) * 1.626));
+  --tile-gap: 4.6vw;
+  --tile-radius: 30px;
+
+  /* Modal de projeto: 949px de 1300px, topo a 142px de 924px. */
+  --modal-w: min(73vw, 1100px);
+  --modal-top: 15.4vh;
+  --modal-radius: 64px;
 }
 
 body {
   margin: 0;
   font-family:
+    'Poppins',
     system-ui,
     -apple-system,
     'Segoe UI',
     sans-serif;
+  font-weight: 400;
   line-height: 1.5;
   color: var(--text);
   background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+body.is-project-open {
+  overflow: hidden;
 }
 
 img {
@@ -43,31 +65,48 @@ button {
   font-family: inherit;
 }
 
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Header ---------- */
+
 .site-header {
-  padding: 1.25rem 1.5rem;
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 150;
+  padding: 36px 50px 0 57px;
+  transition: padding 0.3s ease;
 }
 
 .site-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   gap: 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  min-height: 41px;
 }
 
 .site-nav__brand {
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
   text-decoration: none;
-  font-size: 0.95rem;
+  color: var(--text);
 }
 
 .site-nav__utility {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 31px;
 }
 
 .site-nav__icons {
@@ -78,10 +117,13 @@ button {
 
 .site-nav__icon-link {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
   color: var(--text-muted);
   text-decoration: none;
+}
+
+.site-nav__icon-link svg {
+  width: 19px;
+  height: 19px;
 }
 
 .site-nav__icon-link:hover,
@@ -92,74 +134,97 @@ button {
 .site-nav__cta {
   display: inline-flex;
   align-items: center;
+  height: 41px;
+  padding: 0 15px;
   border: none;
-  border-radius: 999px;
-  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
   background: var(--surface);
   color: var(--text);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 16px;
+  font-weight: 400;
+  text-transform: uppercase;
   cursor: pointer;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    padding 0.3s ease;
 }
 
 .site-nav__cta:hover,
 .site-nav__cta:focus-visible {
-  background: #232323;
+  background: #444;
 }
 
 .language-switch {
   display: flex;
-  gap: 0.25rem;
+  gap: 2px;
 }
 
 .language-switch__option {
-  border: 1px solid var(--border);
-  background: transparent;
-  border-radius: 4px;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  border: none;
+  background: none;
+  padding: 2px 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6f6f6f;
   cursor: pointer;
-  color: inherit;
 }
 
 .language-switch__option[aria-pressed='true'] {
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
+  color: var(--text);
 }
 
-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  padding-bottom: 4rem;
+/* Com um projeto aberto: CTA vira texto cinza, sem pílula; LinkedIn e
+   idioma somem; header ganha fundo para o modal rolar por baixo. */
+.is-project-open .site-header {
+  padding-top: 28px;
+  padding-bottom: 16px;
+  background: var(--bg);
 }
+
+.is-project-open .site-nav__cta {
+  padding: 0;
+  background: none;
+  color: var(--text-muted);
+}
+
+.is-project-open .site-nav__cta:hover,
+.is-project-open .site-nav__cta:focus-visible {
+  color: var(--text);
+}
+
+.is-project-open .site-nav__icons,
+.is-project-open .language-switch {
+  display: none;
+}
+
+/* ---------- Footer ---------- */
 
 .site-footer {
   position: fixed;
   inset: auto 0 0 0;
-  z-index: 50;
-  padding: 1.25rem 1.5rem;
+  z-index: 150;
+  padding: 0 52px 46px 58px;
   pointer-events: none;
+}
+
+/* Na home (sem projeto aberto) a referência não mostra rodapé. */
+body:has(.view--home):not(.is-project-open) .site-footer {
+  display: none;
 }
 
 .site-footer__row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
 }
 
 .site-footer__link {
   pointer-events: auto;
   text-decoration: none;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 400;
   color: var(--text-muted);
 }
 
@@ -168,71 +233,134 @@ main {
   color: var(--text);
 }
 
-.hero {
-  margin-bottom: 2rem;
+/* ---------- Layout ---------- */
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 130px 1.5rem 6rem;
 }
 
-.hero__eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.875rem;
-  opacity: 0.7;
+main:has(> .view--home) {
+  max-width: none;
+  padding: 0;
 }
 
-.hero__title {
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-  margin: 0.5rem 0 0;
+.view--home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 36px;
 }
 
-/*
- * O carrossel "vaza" para a largura total da viewport (em vez de ficar
- * preso aos 1200px do <main>) justamente para que os tiles adjacentes
- * apareçam espiando nas bordas da tela, como na referência visual —
- * mesmo em telas bem largas.
- */
-.project-carousel {
-  width: 100vw;
-  margin-inline: calc(50% - 50vw);
-  padding-inline: clamp(1.5rem, 9vw, 13rem);
-}
+/* ---------- Carrossel da home ---------- */
 
 .project-carousel__track {
   display: flex;
-  gap: 1.5rem;
+  align-items: center;
+  gap: var(--tile-gap);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding-block: 0.25rem 1rem;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  padding: 60px calc(50vw - var(--tile-w) / 2);
+  margin: -60px 0;
 }
 
-.project-carousel__track .project-card {
-  flex: 0 0 min(960px, 78vw);
-  scroll-snap-align: start;
-}
-
-.project-carousel__hint {
-  margin: 0;
-  font-size: 0.75rem;
-  opacity: 0.6;
+.project-carousel__track::-webkit-scrollbar {
+  display: none;
 }
 
 .project-card {
-  border-radius: 12px;
+  position: relative;
+  flex: 0 0 var(--tile-w);
+  aspect-ratio: 862 / 530;
+  border-radius: var(--tile-radius);
   overflow: hidden;
+  scroll-snap-align: center;
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Vizinhos: 460px de altura contra 530px do ativo (≈ 0.867), ancorados
+   na borda voltada para o card ativo. */
+.project-card.is-before {
+  transform: scale(0.867);
+  transform-origin: right center;
+}
+
+.project-card.is-after {
+  transform: scale(0.867);
+  transform-origin: left center;
+}
+
+/* Com o modal aberto os vizinhos crescem (≈ 592px de altura). */
+.is-project-open .project-card.is-before,
+.is-project-open .project-card.is-after {
+  transform: translateY(20px) scale(1.117);
+}
+
+.project-card:has(.project-card__link:focus-visible) {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
 }
 
 .project-card__link {
   position: relative;
   display: block;
+  height: 100%;
   color: #fff;
+  text-decoration: none;
+  outline: none;
 }
 
+.project-card__link::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 55%;
+  background: linear-gradient(to top, rgba(22, 24, 48, 0.72), rgba(22, 24, 48, 0));
+  pointer-events: none;
+}
+
+.project-card__link .image-placeholder {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  border-radius: 0;
+}
+
+/* Legenda: título a 68px e texto a 59px da base, num tile de 862px. */
+.project-card__caption {
+  position: absolute;
+  inset: auto 20% 0 0;
+  z-index: 1;
+  padding: 0 0 6.8% 7.9%;
+}
+
+.project-card__title {
+  margin: 0;
+  font-size: clamp(20px, 2.15vw, 34px);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.project-card__summary {
+  margin: clamp(10px, 1.3vw, 20px) 0 0;
+  max-width: 520px;
+  font-size: clamp(14px, 1.385vw, 21px);
+  font-weight: 300;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* Botão de seta: círculo preto de 51px, 25px da direita, 48px da base. */
 .project-card__arrow {
   position: absolute;
-  right: 1.25rem;
-  bottom: 1rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  right: 2.9%;
+  bottom: 9.1%;
+  z-index: 1;
+  width: clamp(40px, 3.92vw, 60px);
+  aspect-ratio: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -241,45 +369,62 @@ main {
   color: #fff;
 }
 
-.project-card__link:focus-visible {
-  outline: 2px solid #111;
-  outline-offset: 2px;
+.project-card__arrow svg {
+  width: 36%;
+  height: 36%;
 }
 
-.project-card__link .image-placeholder {
-  border-radius: 0;
-  border: none;
-  height: 100%;
+/* ---------- Placeholder de imagem (gradientes provisórios) ---------- */
+
+.image-placeholder {
+  display: block;
+  width: 100%;
+  background-color: #3d3a7a;
 }
 
-.project-card__caption {
+.image-placeholder__label,
+.image-placeholder__caption {
   position: absolute;
-  inset: auto 4.5rem 0 0;
-  padding: 2.5rem 1.25rem 1.25rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
-.project-card__title {
-  margin: 0;
-  font-size: 1.125rem;
+.image-placeholder--v0 {
+  background:
+    radial-gradient(60% 80% at 15% 20%, rgba(90, 170, 240, 0.55), transparent 70%),
+    radial-gradient(50% 60% at 60% 60%, rgba(150, 40, 230, 0.55), transparent 70%),
+    linear-gradient(135deg, #5a6cc4 0%, #7c7fcf 55%, #8a7cc9 100%);
 }
 
-.project-card__summary {
-  margin: 0.35rem 0 0;
-  font-size: 0.875rem;
-  opacity: 0.85;
+.image-placeholder--v1 {
+  background:
+    radial-gradient(90% 70% at 10% 95%, rgba(170, 80, 190, 0.6), transparent 70%),
+    linear-gradient(165deg, #1c0036 0%, #2c0c55 45%, #4f3584 75%, #3a2266 100%);
 }
+
+.image-placeholder--v2 {
+  background:
+    radial-gradient(80% 60% at 85% 80%, rgba(210, 110, 220, 0.55), transparent 70%),
+    linear-gradient(200deg, #1f0840 0%, #5b2a96 55%, #8d55c4 100%);
+}
+
+.image-placeholder--v3 {
+  background:
+    radial-gradient(70% 70% at 20% 30%, rgba(120, 190, 255, 0.5), transparent 70%),
+    linear-gradient(140deg, #1b2a6b 0%, #3f5fc4 55%, #7d8fe0 100%);
+}
+
+/* ---------- Modal de projeto (painel branco) ---------- */
 
 .project-modal {
   position: fixed;
   inset: 0;
-  background: rgba(17, 17, 17, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 1.5rem;
   z-index: 100;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .project-modal:focus {
@@ -287,83 +432,109 @@ main {
 }
 
 .project-modal__dialog {
+  container-type: inline-size;
   position: relative;
+  width: var(--modal-w);
+  min-height: calc(100vh - var(--modal-top));
+  margin: var(--modal-top) auto 0;
+  padding: 64px 6vw 140px;
   background: #fff;
-  border-radius: 12px;
-  width: 100%;
-  max-width: min(960px, 78vw);
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 2rem;
+  color: var(--ink);
+  border-radius: var(--modal-radius) var(--modal-radius) 0 0;
 }
 
+/* Fechar: círculo preto de 51px, 39px do topo e 38px da direita. */
 .project-modal__close {
   position: absolute;
-  top: 1.25rem;
-  right: 1.25rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  top: 39px;
+  right: 38px;
+  z-index: 2;
+  width: 51px;
+  height: 51px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
   border: none;
-  background: #111;
-  color: #fff;
-  cursor: pointer;
-}
-
-.project-modal__nav {
-  flex: 0 0 auto;
-  width: 2.5rem;
-  height: 2.5rem;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.1);
+  background: #000;
   color: #fff;
-  font-size: 1.5rem;
-  line-height: 1;
   cursor: pointer;
 }
 
-.project-modal__nav:hover,
+.project-modal__close svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Anterior/próximo: áreas clicáveis transparentes sobre os tiles
+   vizinhos que espiam nas bordas (a referência não mostra setas). */
+.project-modal__nav {
+  position: fixed;
+  top: 20vh;
+  bottom: 14vh;
+  z-index: 101;
+  width: calc((100vw - var(--modal-w)) / 2 - 24px);
+  border: none;
+  background: transparent;
+  font-size: 0;
+  color: transparent;
+  cursor: pointer;
+}
+
+.project-modal__nav--prev {
+  left: 0;
+}
+
+.project-modal__nav--next {
+  right: 0;
+}
+
 .project-modal__nav:focus-visible {
-  background: rgba(255, 255, 255, 0.25);
+  outline: 2px solid #fff;
+  outline-offset: -6px;
+  border-radius: var(--tile-radius);
 }
 
-.project-detail {
-  color: #111;
-}
-
-.project-detail__cover .image-placeholder {
-  border-radius: 12px;
-}
+/* ---------- Case study (conteúdo do modal) ---------- */
 
 .project-detail__intro {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 37.3cqw minmax(0, 1fr);
+  column-gap: 5.7cqw;
   align-items: start;
-  margin-bottom: 2rem;
-}
-
-.project-detail__intro-text {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .project-detail__title {
   margin: 0;
+  font-size: clamp(24px, 3.8cqw, 34px);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--ink);
 }
 
 .project-detail__summary {
-  margin: 0;
-  opacity: 0.7;
+  margin: 20px 0 0;
+  font-size: clamp(15px, 2.27cqw, 20px);
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+/* cqw = % da área de conteúdo do painel (793px de 949px).
+   Imagem: 567×465 num modal de 949px, 65px abaixo do título e vazando
+   38px para fora da borda direita do painel. */
+.project-detail__cover {
+  margin: 8.2cqw -14.6cqw 0 0;
+}
+
+.project-detail__cover .image-placeholder {
+  aspect-ratio: 567 / 465;
+  border-radius: 40px;
 }
 
 .project-detail__meta {
-  margin: 0.75rem 0 0;
+  width: 93%;
+  margin: 80px 0 0;
 }
 
 .project-detail__meta-row {
@@ -371,73 +542,89 @@ main {
   justify-content: space-between;
   align-items: baseline;
   gap: 1rem;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid #e2e2e2;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
 }
 
-.project-detail__meta-label {
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 0.75rem;
-  color: #888;
+.project-detail__meta-row:last-child {
+  border-bottom: none;
 }
 
+.project-detail__meta-label,
 .project-detail__meta-value {
   margin: 0;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 20px;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-@media (max-width: 720px) {
-  .project-detail__intro {
-    grid-template-columns: 1fr;
-  }
+  color: #8b8b8b;
 }
 
 .project-detail__body {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  margin-top: 1.5rem;
-}
-
-.project-detail__section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  gap: 80px;
+  margin-top: 100px;
+  max-width: 37.3cqw;
 }
 
 .project-detail__heading {
-  font-size: 1.25rem;
-  margin: 0;
+  margin: 0 0 20px;
+  font-size: clamp(24px, 3.8cqw, 34px);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--ink);
 }
 
-.image-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  aspect-ratio: 16 / 9;
-  background: #f2f2f2;
-  border: 1px dashed #ccc;
-  border-radius: 8px;
-  color: #888;
-  text-align: center;
-  padding: 1rem;
+.project-detail__paragraph {
+  margin: 0 0 1em;
+  font-size: clamp(15px, 2.27cqw, 20px);
+  line-height: 1.5;
+  color: var(--ink-muted);
 }
 
-.image-placeholder__label {
-  font-weight: 600;
+@media (max-width: 720px) {
+  :root {
+    --tile-w: 84vw;
+    --modal-w: 100vw;
+    --modal-radius: 32px;
+  }
+
+  .site-header {
+    padding: 20px 20px 0;
+  }
+
+  .site-footer {
+    padding: 0 20px 20px;
+  }
+
+  .project-modal__dialog {
+    padding: 72px 24px 100px;
+  }
+
+  .project-detail__intro {
+    grid-template-columns: 1fr;
+  }
+
+  .project-detail__cover {
+    margin: 32px 0 0;
+  }
+
+  .project-detail__body {
+    max-width: none;
+  }
+
+  .project-modal__nav {
+    display: none;
+  }
 }
 
-.image-placeholder__caption {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+/* ---------- Outras páginas ---------- */
+
+.view--experience h1,
+.view--testimonials h1 {
+  font-weight: 400;
 }
 
 .experience-list {
@@ -502,7 +689,7 @@ main {
   position: relative;
   background: #fff;
   color: #111;
-  border-radius: 16px;
+  border-radius: 32px;
   width: 100%;
   max-width: 440px;
   max-height: 90vh;

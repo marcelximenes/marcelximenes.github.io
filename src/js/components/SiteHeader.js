@@ -55,8 +55,8 @@ export function SiteHeader(locale, { onWorkWithMeClick } = {}) {
   );
 
   const utility = createElement('div', { className: 'site-nav__utility' }, [
-    icons,
     LanguageSwitch(),
+    icons,
     workWithMeButton,
   ]);
 

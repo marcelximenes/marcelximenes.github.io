@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { ProjectCarousel } from '../src/js/components/ProjectCarousel.js';
 
@@ -66,6 +66,58 @@ describe('ProjectCarousel', () => {
     carousel.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
 
     expect(document.activeElement).toBe(links[0]);
+  });
+
+  it('marks the first card as active by default, and the rest as after it', () => {
+    const carousel = ProjectCarousel(projects, 'en');
+    const cards = carousel.querySelectorAll('.project-card');
+    expect(cards[0].classList.contains('is-active')).toBe(true);
+    expect(cards[1].classList.contains('is-after')).toBe(true);
+    expect(cards[2].classList.contains('is-after')).toBe(true);
+  });
+
+  it('centers on the given activeProjectId, with neighbours before/after it', () => {
+    const carousel = ProjectCarousel(projects, 'en', { activeProjectId: 'beta' });
+    const cards = carousel.querySelectorAll('.project-card');
+    expect(cards[0].classList.contains('is-before')).toBe(true);
+    expect(cards[1].classList.contains('is-active')).toBe(true);
+    expect(cards[2].classList.contains('is-after')).toBe(true);
+  });
+
+  it('moves the active card along with keyboard focus', () => {
+    const carousel = mount(ProjectCarousel(projects, 'en'));
+    const cards = carousel.querySelectorAll('.project-card');
+    carousel.querySelectorAll('.project-card__link')[0].focus();
+
+    carousel.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+
+    expect(cards[1].classList.contains('is-active')).toBe(true);
+    expect(cards[0].classList.contains('is-before')).toBe(true);
+  });
+
+  it('makes the card closest to the centre active once a manual scroll settles', () => {
+    vi.useFakeTimers();
+    const carousel = mount(ProjectCarousel(projects, 'en', { activeProjectId: 'gamma' }));
+    const track = carousel.querySelector('.project-carousel__track');
+
+    track.dispatchEvent(new Event('scroll'));
+    vi.advanceTimersByTime(100);
+
+    // jsdom não tem layout: todos os cards medem 0, então o primeiro vence.
+    expect(carousel.querySelectorAll('.project-card')[0].classList.contains('is-active')).toBe(
+      true,
+    );
+    vi.useRealTimers();
+  });
+
+  it('centres the initial card on the next frame once mounted', async () => {
+    const carousel = mount(ProjectCarousel(projects, 'en', { activeProjectId: 'beta' }));
+    const track = carousel.querySelector('.project-carousel__track');
+    track.scrollTo = vi.fn();
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(track.scrollTo).toHaveBeenCalled();
   });
 
   it('ignores keys other than the arrow keys', () => {

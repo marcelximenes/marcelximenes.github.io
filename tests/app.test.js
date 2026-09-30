@@ -44,6 +44,26 @@ describe('createApp', () => {
     expect(root.querySelector('.project-modal')).not.toBeNull();
   });
 
+  it('flags the body while a project is open, and clears it on close', () => {
+    const router = createApp(root, { header, footer });
+    window.location.hash = '#/project/volvo';
+    router.start();
+    expect(document.body.classList.contains('is-project-open')).toBe(true);
+
+    window.location.hash = '#/';
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    expect(document.body.classList.contains('is-project-open')).toBe(false);
+  });
+
+  it('centers the carousel on the open project behind the modal', () => {
+    const router = createApp(root, { header, footer });
+    window.location.hash = '#/project/volvo';
+    router.start();
+
+    const active = root.querySelector('.project-card.is-active');
+    expect(active.dataset.projectId).toBe('volvo');
+  });
+
   it('closes the project modal when its onClose navigates back to the root route', () => {
     const router = createApp(root, { header, footer });
     window.location.hash = '#/project/volvo';

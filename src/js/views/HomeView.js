@@ -51,13 +51,15 @@ function buildProjectModal(selectedProjectId, locale) {
  * @returns {HTMLElement}
  */
 export function HomeView(locale, selectedProjectId = null) {
-  const heading = createElement('div', { className: 'hero' }, [
+  // Hero e dica de teclado ficam só para leitores de tela: a referência
+  // visual da home mostra apenas o carrossel.
+  const heading = createElement('div', { className: 'hero visually-hidden' }, [
     createElement('p', { className: 'hero__eyebrow' }, [t(locale, 'hero.eyebrow')]),
     createElement('h1', { className: 'hero__title' }, [t(locale, 'hero.title')]),
   ]);
 
-  const carousel = ProjectCarousel(projects, locale);
-  const hint = createElement('p', { className: 'project-carousel__hint' }, [
+  const carousel = ProjectCarousel(projects, locale, { activeProjectId: selectedProjectId });
+  const hint = createElement('p', { className: 'project-carousel__hint visually-hidden' }, [
     t(locale, 'project.carouselHint'),
   ]);
 
