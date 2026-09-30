@@ -2,6 +2,7 @@ import { getProjectTranslation } from '../data/projects.js';
 import { t } from '../i18n/strings.js';
 import { createElement } from '../utils/dom.js';
 
+import { ArrowRightIcon } from './icons.js';
 import { ImagePlaceholder } from './ImagePlaceholder.js';
 
 /**
@@ -24,6 +25,15 @@ export function ProjectCard(project, locale) {
     createElement('p', { className: 'project-card__summary' }, [translation.summary]),
   ]);
 
+  // Botão puramente decorativo: o link que envolve o tile já leva ao case
+  // study, então o ícone não precisa (e não deve) de seu próprio rótulo
+  // acessível/foco — evita duplicar o mesmo destino duas vezes no tab order.
+  const arrowButton = createElement(
+    'span',
+    { className: 'project-card__arrow', 'aria-hidden': 'true' },
+    [ArrowRightIcon()],
+  );
+
   const link = createElement(
     'a',
     {
@@ -31,7 +41,7 @@ export function ProjectCard(project, locale) {
       href: `#/project/${project.id}`,
       'aria-label': `${translation.title} — ${t(locale, 'project.seeMore')}`,
     },
-    [image, caption],
+    [image, caption, arrowButton],
   );
 
   return createElement(

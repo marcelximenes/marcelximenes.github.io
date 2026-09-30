@@ -1,15 +1,14 @@
 import { t } from '../i18n/strings.js';
 import { createElement } from '../utils/dom.js';
 
-import { BriefcaseIcon, LinkedInIcon, MailIcon, QuoteIcon } from './icons.js';
+import { LinkedInIcon } from './icons.js';
 import { LanguageSwitch } from './LanguageSwitch.js';
 
 const LINKEDIN_URL = 'https://www.linkedin.com/in/marcelximenes/';
-const CONTACT_EMAIL = 'marcelximenes@proton.me';
 
 /**
- * Cria um link de ícone (Experience, LinkedIn, Contato), com rótulo
- * acessível via aria-label — o ícone em si é decorativo.
+ * Cria um link de ícone (ex: LinkedIn), com rótulo acessível via
+ * aria-label — o ícone em si é decorativo.
  * @param {Object} attrs
  * @param {string} label
  * @param {SVGElement} icon
@@ -22,8 +21,11 @@ function iconLink(attrs, label, icon) {
 }
 
 /**
- * Renderiza a navegação principal do site: marca à esquerda, ícones de
- * navegação/contato e o CTA "Work with me!" à direita.
+ * Renderiza a navegação principal do site: marca à esquerda, ícone do
+ * LinkedIn e o CTA "Work with me!" à direita. Experience, Testimonials e
+ * Contato saíram do header — ficam como links no rodapé (SiteFooter),
+ * que fica visível em qualquer página/estado (inclusive com o modal de
+ * projeto aberto).
  * @param {string} locale
  * @param {Object} [handlers]
  * @param {() => void} [handlers.onWorkWithMeClick]
@@ -35,14 +37,11 @@ export function SiteHeader(locale, { onWorkWithMeClick } = {}) {
   ]);
 
   const icons = createElement('div', { className: 'site-nav__icons' }, [
-    iconLink({ href: '#/experience' }, t(locale, 'nav.experience'), BriefcaseIcon()),
-    iconLink({ href: '#/testimonials' }, t(locale, 'nav.testimonials'), QuoteIcon()),
     iconLink(
       { href: LINKEDIN_URL, target: '_blank', rel: 'noopener noreferrer' },
       t(locale, 'nav.linkedin'),
       LinkedInIcon(),
     ),
-    iconLink({ href: `mailto:${CONTACT_EMAIL}` }, t(locale, 'nav.contact'), MailIcon()),
   ]);
 
   const workWithMeButton = createElement(

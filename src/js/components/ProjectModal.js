@@ -1,6 +1,7 @@
 import { t } from '../i18n/strings.js';
 import { createElement } from '../utils/dom.js';
 
+import { CloseIcon } from './icons.js';
 import { ProjectDetail } from './ProjectDetail.js';
 
 /**
@@ -43,7 +44,7 @@ export function ProjectModal(project, locale, { onClose, onPrev = null, onNext =
       'aria-label': t(locale, 'project.close'),
       onClick: onClose,
     },
-    ['×'],
+    [CloseIcon()],
   );
 
   const dialog = createElement(

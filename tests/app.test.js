@@ -147,14 +147,12 @@ describe('createApp', () => {
     expect(footer.querySelector('a')).not.toBeNull();
   });
 
-  it('renders experience, testimonials, LinkedIn and contact as icon links in the header', () => {
+  it('renders only the LinkedIn icon link in the header', () => {
     createApp(root, { header, footer });
 
     const iconLinks = header.querySelectorAll('.site-nav__icons a');
-    expect(iconLinks).toHaveLength(4);
-    expect(iconLinks[0].getAttribute('href')).toBe('#/experience');
-    expect(iconLinks[1].getAttribute('href')).toBe('#/testimonials');
-    expect(iconLinks[3].getAttribute('href')).toBe('mailto:marcelximenes@proton.me');
+    expect(iconLinks).toHaveLength(1);
+    expect(iconLinks[0].getAttribute('href')).toBe('https://www.linkedin.com/in/marcelximenes/');
   });
 
   it('does not render a "Projects" link in the header (home already is the project list)', () => {
@@ -162,6 +160,17 @@ describe('createApp', () => {
 
     const hrefs = Array.from(header.querySelectorAll('a')).map((a) => a.getAttribute('href'));
     expect(hrefs.filter((href) => href === '#/')).toHaveLength(1); // only the brand link
+  });
+
+  it('renders Experience and Contact links in the footer', () => {
+    createApp(root, { header, footer });
+
+    const links = footer.querySelectorAll('.site-footer__link');
+    expect(links).toHaveLength(2);
+    expect(links[0].getAttribute('href')).toBe('#/experience');
+    expect(links[0].textContent).toBe('Experience');
+    expect(links[1].getAttribute('href')).toBe('mailto:marcelximenes@proton.me');
+    expect(links[1].textContent).toBe('Contact!');
   });
 
   it('renders a "Work with me!" button in the header', () => {

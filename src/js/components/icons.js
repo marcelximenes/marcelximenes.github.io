@@ -43,15 +43,6 @@ function baseSvg(children) {
   );
 }
 
-/** Ícone de maleta (Experiência). */
-export function BriefcaseIcon() {
-  return baseSvg([
-    createSvgElement('rect', { x: '2.5', y: '7', width: '19', height: '13', rx: '2' }),
-    createSvgElement('path', { d: 'M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7' }),
-    createSvgElement('path', { d: 'M2.5 13h19' }),
-  ]);
-}
-
 /** Ícone do LinkedIn ("in" dentro de um quadrado arredondado). */
 export function LinkedInIcon() {
   return createSvgElement(
@@ -72,30 +63,18 @@ export function LinkedInIcon() {
   );
 }
 
-/** Ícone de aspas (depoimentos). */
-export function QuoteIcon() {
-  return baseSvg([
-    createSvgElement('path', {
-      d: 'M7.5 8.5c-2 0-3.5 1.6-3.5 3.6 0 1.9 1.5 3.4 3.4 3.4.3 0 .6 0 .8-.1-.4 1.6-1.7 2.9-3.2 3.4l.6 1.2c2.6-.8 4.7-3 4.9-6.3.1-2.9-1.2-5.2-3-5.2Z',
-    }),
-    createSvgElement('path', {
-      d: 'M17 8.5c-2 0-3.5 1.6-3.5 3.6 0 1.9 1.5 3.4 3.4 3.4.3 0 .6 0 .8-.1-.4 1.6-1.7 2.9-3.2 3.4l.6 1.2c2.6-.8 4.7-3 4.9-6.3.1-2.9-1.2-5.2-3-5.2Z',
-    }),
-  ]);
-}
-
-/** Ícone de envelope (contato). */
-export function MailIcon() {
-  return baseSvg([
-    createSvgElement('rect', { x: '2.5', y: '4.5', width: '19', height: '15', rx: '2' }),
-    createSvgElement('path', { d: 'm3 6 9 7 9-7' }),
-  ]);
-}
-
 /** Ícone de fechar (X), usado em modais. */
 export function CloseIcon() {
   return baseSvg([
     createSvgElement('path', { d: 'm5 5 14 14' }),
     createSvgElement('path', { d: 'm19 5-14 14' }),
+  ]);
+}
+
+/** Ícone de flecha para a direita, usado no CTA dos tiles de projeto. */
+export function ArrowRightIcon() {
+  return baseSvg([
+    createSvgElement('path', { d: 'M5 12h14' }),
+    createSvgElement('path', { d: 'm13 6 6 6-6 6' }),
   ]);
 }

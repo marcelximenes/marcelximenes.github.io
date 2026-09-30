@@ -72,6 +72,21 @@ docs/
   "enviar" no cliente dela. Se no futuro quiser um envio realmente
   automático, precisa de um serviço de terceiros (ex: Formspree, EmailJS)
   que aceite POST de formulário estático — não dá pra fazer 100% estático.
+- **Header só com marca + LinkedIn + CTA; Experience/Contato no rodapé**:
+  seguindo a referência visual mais recente, o header ficou reduzido ao
+  essencial (marca, ícone do LinkedIn, botão "Work with me!"); os links
+  para Experience e Contato foram movidos para um rodapé fixo nos cantos
+  inferiores da tela (`SiteFooter`), visível em qualquer rota — inclusive
+  com o modal de projeto aberto por cima.
+- **Metadado "Client" no case study, sem "Year"**: o modal de projeto
+  agora exibe um campo "Client" (`project.client` em `data/projects.js`)
+  quando o nome da instituição já está explícito no texto do case study.
+  Quando não está (ex: Stefanini, onde o projeto é trabalho interno, não
+  para um cliente externo; Moinhos Connect, cujo hospital não é nomeado
+  no texto), o campo fica `null` e a linha simplesmente não aparece — em
+  vez de inventar um valor. Não existe campo "Year": nenhum case study
+  documenta uma data confiável, então essa informação foi propositalmente
+  omitida. ⚠️ Se quiser anos reais exibidos, é preciso fornecer os dados.
 - **Ícones inline, sem lib de ícones** (`components/icons.js`): SVGs
   construídos via `document.createElementNS`, não `createElement` (que
   usa `document.createElement`, errado para SVG/path — teria criado
@@ -115,7 +130,7 @@ npm run validate       # lint + format:check + test — roda tudo, como no CI
 
 Cobertura atual: **~100% statements/lines/funcs, ~97% branches** em
 `src/js/` (exceto `main.js`, que é só bootstrap e não tem lógica a testar).
-112 testes. Rodar `npm run test:coverage` gera relatório HTML em
+115 testes. Rodar `npm run test:coverage` gera relatório HTML em
 `coverage/index.html`.
 
 Convenção: cada arquivo em `src/js/**/*.js` tem um `.test.js`

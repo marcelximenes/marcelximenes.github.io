@@ -30,6 +30,7 @@ export const strings = {
       close: 'Close',
       prevProject: 'Previous project',
       nextProject: 'Next project',
+      metaClient: 'Client',
     },
     experience: {
       title: 'My Experience',
@@ -41,6 +42,8 @@ export const strings = {
     },
     footer: {
       linkedin: 'LinkedIn',
+      experience: 'Experience',
+      contact: 'Contact!',
     },
     languageSwitch: {
       label: 'Language',
@@ -85,6 +88,7 @@ export const strings = {
       close: 'Fechar',
       prevProject: 'Projeto anterior',
       nextProject: 'Próximo projeto',
+      metaClient: 'Cliente',
     },
     experience: {
       title: 'Minha Experiência',
@@ -96,6 +100,8 @@ export const strings = {
     },
     footer: {
       linkedin: 'LinkedIn',
+      experience: 'Experiência',
+      contact: 'Contato!',
     },
     languageSwitch: {
       label: 'Idioma',

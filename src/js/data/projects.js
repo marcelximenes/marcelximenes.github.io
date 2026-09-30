@@ -12,6 +12,15 @@
  *
  * @typedef {Object} Project
  * @property {string} id - Identificador único (slug), usado na URL e no DOM.
+ * @property {string | null} client - Nome do cliente/instituição, exibido no
+ *   case study (ex: "CLIENT" no modal do projeto). `null` quando o projeto
+ *   não é um trabalho para um cliente externo (ex: atuação interna como
+ *   funcionário) ou quando o nome da instituição não está explicitado no
+ *   texto do case study — nesses casos a linha "Client" não é renderizada,
+ *   em vez de inventar um valor. Não há campo "year": nenhum dos case
+ *   studies documenta uma data confiável, então essa informação foi
+ *   deliberadamente omitida em vez de presumida. ⚠️ Suposição a confirmar
+ *   com o Marcel: se quiser exibir anos reais, precisa fornecer os dados.
  * @property {{ en: ProjectTranslation, pt: ProjectTranslation }} translations
  */
 
@@ -19,6 +28,9 @@
 export const projects = [
   {
     id: 'stefanini',
+    // Trabalho interno (liderança de time na própria Stefanini), não um
+    // projeto para um cliente externo — por isso client: null.
+    client: null,
     translations: {
       en: {
         title: 'Stefanini Group',
@@ -88,6 +100,7 @@ export const projects = [
   },
   {
     id: 'volvo',
+    client: 'Volvo',
     translations: {
       en: {
         title: 'Volvo Bank',
@@ -158,6 +171,7 @@ export const projects = [
   },
   {
     id: 'sesc-senac',
+    client: 'SESC / SENAC',
     translations: {
       en: {
         title: 'SESC / SENAC',
@@ -198,6 +212,7 @@ export const projects = [
   },
   {
     id: 'seduc-recife',
+    client: 'SEDUC Recife',
     translations: {
       en: {
         title: 'SEDUC Recife',
@@ -267,6 +282,9 @@ export const projects = [
   },
   {
     id: 'moinhos-connect',
+    // O texto menciona "the hospital" sem nomear a instituição
+    // explicitamente — client: null em vez de supor o nome.
+    client: null,
     translations: {
       en: {
         title: 'Moinhos Connect',
@@ -327,6 +345,7 @@ export const projects = [
   },
   {
     id: 'ayrton-senna',
+    client: 'Instituto Ayrton Senna',
     translations: {
       en: {
         title: 'Inst. Ayrton Senna',
@@ -391,6 +410,7 @@ export const projects = [
   },
   {
     id: 'nidus',
+    client: 'Polícia Federal',
     translations: {
       en: {
         title: 'NIDUS — Federal Police Child Protection Platform',
@@ -445,6 +465,7 @@ export const projects = [
   },
   {
     id: 'frontline',
+    client: 'Polícia Federal',
     translations: {
       en: {
         title: 'Frontline — Federal Design System Alignment',

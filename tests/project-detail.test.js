@@ -4,6 +4,7 @@ import { ProjectDetail } from '../src/js/components/ProjectDetail.js';
 
 const projectWithoutSections = {
   id: 'stefanini',
+  client: null,
   translations: {
     en: { title: 'Stefanini Group', summary: 'Leading design teams.', sections: [] },
     pt: { title: 'Stefanini Group', summary: 'Liderando times de design.', sections: [] },
@@ -12,6 +13,7 @@ const projectWithoutSections = {
 
 const projectWithSections = {
   id: 'volvo',
+  client: 'Volvo',
   translations: {
     en: {
       title: 'Volvo Bank',
@@ -46,11 +48,21 @@ describe('ProjectDetail', () => {
     expect(detail.querySelector('.project-detail__heading').textContent).toBe('2. Discovery');
   });
 
-  it('includes a localized back link to the project list', () => {
-    const detail = ProjectDetail(projectWithoutSections, 'pt');
-    const backLink = detail.querySelector('.project-detail__back');
-    expect(backLink.getAttribute('href')).toBe('#/');
-    expect(backLink.textContent).toBe('← Voltar para projetos');
+  it('does not render a meta list when the project has no client', () => {
+    const detail = ProjectDetail(projectWithoutSections, 'en');
+    expect(detail.querySelector('.project-detail__meta')).toBeNull();
+  });
+
+  it('renders a "Client" row in the meta list when the project has one', () => {
+    const detail = ProjectDetail(projectWithSections, 'en');
+    const row = detail.querySelector('.project-detail__meta-row');
+    expect(row.querySelector('.project-detail__meta-label').textContent).toBe('Client');
+    expect(row.querySelector('.project-detail__meta-value').textContent).toBe('Volvo');
+  });
+
+  it('uses the localized "Client" label for pt', () => {
+    const detail = ProjectDetail(projectWithSections, 'pt');
+    expect(detail.querySelector('.project-detail__meta-label').textContent).toBe('Cliente');
   });
 
   it('renders an image placeholder instead of a real image', () => {
