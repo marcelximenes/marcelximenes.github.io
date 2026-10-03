@@ -94,4 +94,31 @@ describe('ProjectModal', () => {
     expect(onNext).toHaveBeenCalledOnce();
     expect(onPrev).not.toHaveBeenCalled();
   });
+
+  it('shows the neighbouring projects as peeking cards with their cover photos', () => {
+    const neighbour = (id, title) => ({
+      id,
+      translations: {
+        en: { title, summary: '', sections: [] },
+        pt: { title, summary: '', sections: [] },
+      },
+    });
+    const modal = ProjectModal(project, 'en', {
+      onClose: vi.fn(),
+      onPrev: vi.fn(),
+      onNext: vi.fn(),
+      prevProject: neighbour('stefanini', 'Stefanini Group'),
+      nextProject: neighbour('nidus', 'NIDUS'),
+    });
+
+    const prev = modal.querySelector('.project-modal__peek.project-modal__nav--prev');
+    const next = modal.querySelector('.project-modal__peek.project-modal__nav--next');
+    expect(prev.getAttribute('aria-label')).toBe('Previous project: Stefanini Group');
+    expect(prev.querySelector('img').getAttribute('src')).toBe(
+      '/images/projects/stefanini/cover.webp',
+    );
+    // Sem fotos: a espiada usa o placeholder abstrato.
+    expect(next.getAttribute('aria-label')).toBe('Next project: NIDUS');
+    expect(next.querySelector('.image-placeholder')).not.toBeNull();
+  });
 });

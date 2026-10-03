@@ -1,13 +1,15 @@
+import { getCoverImage } from '../data/projectImages.js';
 import { getProjectTranslation } from '../data/projects.js';
 import { t } from '../i18n/strings.js';
 import { createElement } from '../utils/dom.js';
 
 import { ArrowRightIcon } from './icons.js';
-import { ImagePlaceholder, placeholderVariant } from './ImagePlaceholder.js';
+import { placeholderVariant } from './ImagePlaceholder.js';
+import { ProjectMedia } from './ProjectMedia.js';
 
 /**
  * Cria o tile de um projeto para o carrossel da home: um painel único,
- * clicável, com a imagem (placeholder por enquanto) preenchendo o tile e
+ * clicável, com a foto de capa (ou placeholder) preenchendo o tile e
  * o título/resumo sobrepostos na base. A mesma proporção de imagem é
  * reaproveitada na capa do case study (ProjectDetail) para que abrir um
  * projeto pareça uma continuação do tile, não uma página diferente.
@@ -18,11 +20,16 @@ import { ImagePlaceholder, placeholderVariant } from './ImagePlaceholder.js';
 export function ProjectCard(project, locale) {
   const translation = getProjectTranslation(project, locale);
 
-  const image = ImagePlaceholder(
-    translation.title,
-    t(locale, 'project.imagePlaceholder'),
-    placeholderVariant(project.id),
-  );
+  // Foto da capa (ou placeholder, se o projeto não tiver fotos). O texto
+  // alternativo fica vazio na foto: o link já diz o nome do projeto.
+  const cover = getCoverImage(project.id);
+  const image = ProjectMedia({
+    src: cover,
+    alt: cover ? '' : translation.title,
+    caption: t(locale, 'project.imagePlaceholder'),
+    variant: placeholderVariant(project.id),
+    eager: true,
+  });
 
   const caption = createElement('div', { className: 'project-card__caption' }, [
     createElement('h3', { className: 'project-card__title' }, [translation.title]),

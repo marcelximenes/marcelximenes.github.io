@@ -75,7 +75,7 @@ describe('motion with the Web Animations API', () => {
 
     expect(document.querySelector('.project-flyer')).not.toBeNull();
     expect(card.classList.contains('is-flying')).toBe(true);
-    expect(modal.querySelector('.project-detail__cover .image-placeholder').style.visibility).toBe(
+    expect(modal.querySelector('.project-detail__cover .project-media').style.visibility).toBe(
       'hidden',
     );
 
@@ -83,9 +83,7 @@ describe('motion with the Web Animations API', () => {
 
     expect(document.querySelector('.project-flyer')).toBeNull();
     expect(card.classList.contains('is-flying')).toBe(false);
-    expect(modal.querySelector('.project-detail__cover .image-placeholder').style.visibility).toBe(
-      '',
-    );
+    expect(modal.querySelector('.project-detail__cover .project-media').style.visibility).toBe('');
   });
 
   it('flies the image back to the tile when closing', async () => {

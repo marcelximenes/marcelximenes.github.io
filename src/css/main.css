@@ -33,8 +33,13 @@
   --ease-in-out: cubic-bezier(0.65, 0, 0.2, 1);
 
   /* Modal de projeto: 949px de 1300px, topo a 142px de 924px. */
-  /* Painel mais largo que a referência (949px/73vw), a pedido. */
-  --modal-w: min(88vw, 1480px);
+  /* Painel mais largo que a referência (949px/73vw), a pedido — mas com
+     folga nas laterais para os projetos vizinhos "espiarem". */
+  --modal-w: min(82vw, 1480px);
+  /* Quanto as imagens do case vazam para fora do painel. */
+  --modal-overhang: min(2.6vw, 40px);
+  /* Distância entre a espiada e a borda do painel. */
+  --peek-gap: 14px;
   --modal-top: 15.4vh;
   --modal-radius: 64px;
 }
@@ -319,10 +324,16 @@ main:has(> .view--home) {
   transform-origin: left center;
 }
 
-/* Com o painel aberto, os vizinhos do carrossel crescem por trás dele. */
-.is-project-open .project-carousel:not(.is-grid) .project-card.is-before .project-card__link,
-.is-project-open .project-carousel:not(.is-grid) .project-card.is-after .project-card__link {
-  transform: translateY(20px) scale(1.117);
+/* Com um projeto aberto, o carrossel some por trás do painel: quem
+   aparece nas laterais são as espiadas do próprio modal (sempre uma de
+   cada lado, também no primeiro/último projeto e no modo grade). */
+.project-carousel {
+  transition: opacity 0.5s ease;
+}
+
+.is-project-open .project-carousel {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Enquanto a imagem "voa" para o painel (ou volta), o tile fica vazio. */
@@ -339,7 +350,7 @@ main:has(> .view--home) {
   pointer-events: none;
 }
 
-.project-card__link .image-placeholder {
+.project-card__link .project-media {
   position: absolute;
   inset: 0;
   height: 100%;
@@ -347,7 +358,7 @@ main:has(> .view--home) {
   transition: transform 1.2s var(--ease-out);
 }
 
-.project-card__link:hover .image-placeholder {
+.project-card__link:hover .project-media {
   transform: scale(1.04);
 }
 
@@ -495,6 +506,16 @@ main:has(> .view--home) {
   color: #111;
 }
 
+/* ---------- Fotos dos projetos ---------- */
+
+.project-media--photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  background: #2b2b33;
+}
+
 /* ---------- Placeholder de imagem (gradientes provisórios) ---------- */
 
 /* O gradiente vem de --art (definido pelo JS a partir de
@@ -521,6 +542,10 @@ main:has(> .view--home) {
   background: transparent;
 }
 
+.has-flowmap .project-card .project-media--photo {
+  opacity: 0;
+}
+
 .flowmap-canvas {
   position: fixed;
   inset: 0;
@@ -545,6 +570,7 @@ main:has(> .view--home) {
   position: fixed;
   inset: 0;
   z-index: 100;
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -588,33 +614,61 @@ main:has(> .view--home) {
   height: 22px;
 }
 
-/* Anterior/próximo: áreas clicáveis transparentes sobre os tiles
-   vizinhos que espiam nas bordas (a referência não mostra setas). */
-.project-modal__nav {
+/* Anterior/próximo: "espiadas" dos projetos vizinhos, cards com a capa
+   deles quase todos fora da tela, encostados nas laterais do painel —
+   como um carrossel mostrando só a borda dos outros itens. Ficam fixas
+   enquanto o case rola. Clique (ou ← →) navega. */
+.project-modal__peek {
+  --peek-w: 34vw;
   position: fixed;
-  top: 20vh;
-  bottom: 14vh;
+  top: calc(var(--modal-top) + 3vh);
   z-index: 101;
-  width: calc((100vw - var(--modal-w)) / 2 - 24px);
+  width: var(--peek-w);
+  height: min(56vh, calc(var(--peek-w) / var(--tile-ratio)));
+  padding: 0;
+  overflow: hidden;
   border: none;
-  background: transparent;
+  border-radius: var(--tile-radius);
+  background: #2b2b33;
   font-size: 0;
-  color: transparent;
   cursor: pointer;
+  transition:
+    transform 0.6s var(--ease-out),
+    filter 0.4s ease;
+  filter: brightness(0.8);
+}
+
+.project-modal__peek .project-media {
+  width: 100%;
+  height: 100%;
+}
+
+.project-modal__peek:hover,
+.project-modal__peek:focus-visible {
+  filter: none;
 }
 
 .project-modal__nav--prev {
-  left: 0;
+  left: calc((100vw - var(--modal-w)) / 2 - var(--peek-gap) - var(--peek-w));
+}
+
+.project-modal__nav--prev:hover,
+.project-modal__nav--prev:focus-visible {
+  transform: translateX(12px);
 }
 
 .project-modal__nav--next {
-  right: 0;
+  right: calc((100vw - var(--modal-w)) / 2 - var(--peek-gap) - var(--peek-w));
 }
 
-.project-modal__nav:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: -6px;
-  border-radius: var(--tile-radius);
+.project-modal__nav--next:hover,
+.project-modal__nav--next:focus-visible {
+  transform: translateX(-12px);
+}
+
+.project-modal__peek:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
 }
 
 /* ---------- Case study (conteúdo do modal) ---------- */
@@ -649,7 +703,7 @@ main:has(> .view--home) {
   margin: 8.2cqw -14.6cqw 0 0;
 }
 
-.project-detail__cover .image-placeholder {
+.project-detail__cover .project-media {
   aspect-ratio: 567 / 465;
   border-radius: 40px;
 }
@@ -685,9 +739,8 @@ main:has(> .view--home) {
 .project-detail__body {
   display: flex;
   flex-direction: column;
-  gap: 80px;
-  margin-top: 100px;
-  max-width: 37.3cqw;
+  gap: 120px;
+  margin-top: 120px;
 }
 
 .project-detail__heading {
@@ -706,12 +759,108 @@ main:has(> .view--home) {
   color: var(--ink-muted);
 }
 
+.project-detail__paragraph:last-child {
+  margin-bottom: 0;
+}
+
+/* Seções do case: título + texto de abertura numa coluna de leitura
+   (~68% do painel, como na referência) e as fotos num dos arranjos
+   abaixo. As fotos vazam para fora do painel (--bleed), também como na
+   referência. */
+.project-detail__section {
+  --bleed: calc(6vw + var(--modal-overhang));
+}
+
+.project-detail__lead,
+.project-detail__more {
+  max-width: 68cqw;
+}
+
+.project-detail__more {
+  margin-top: 56px;
+}
+
+.project-detail__figure {
+  margin: 0;
+  min-width: 0;
+}
+
+.project-detail__figure .project-media {
+  border-radius: 32px;
+}
+
+/* Foto de um lado, texto do outro. */
+.project-detail__split {
+  display: grid;
+  grid-template-columns: 37.3cqw minmax(0, 1fr);
+  column-gap: 5.7cqw;
+  align-items: center;
+  margin-top: 56px;
+}
+
+.project-detail__split .project-media {
+  aspect-ratio: 567 / 400;
+}
+
+.project-detail__section--right .project-detail__figure {
+  margin-right: calc(var(--bleed) * -1);
+}
+
+.project-detail__section--left .project-detail__split {
+  grid-template-columns: minmax(0, 1fr) 37.3cqw;
+}
+
+.project-detail__section--left .project-detail__figure {
+  grid-row: 1;
+  grid-column: 1;
+  margin-left: calc(var(--bleed) * -1);
+}
+
+.project-detail__section--left .project-detail__aside {
+  grid-column: 2;
+}
+
+/* Foto larga, galerias e pares: vazam dos dois lados. */
+.project-detail__media {
+  display: grid;
+  gap: 16px;
+  margin: 56px calc(var(--bleed) * -1) 0;
+}
+
+.project-detail__media--cols-1 {
+  grid-template-columns: 1fr;
+}
+
+.project-detail__media--cols-1 .project-media {
+  aspect-ratio: 16 / 9;
+  border-radius: 40px;
+}
+
+.project-detail__media--cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.project-detail__media--cols-2 .project-media {
+  aspect-ratio: 16 / 10;
+}
+
+.project-detail__media--cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.project-detail__media--cols-3 .project-media {
+  aspect-ratio: 4 / 3;
+  border-radius: 24px;
+}
+
 @media (max-width: 720px) {
   :root {
     --tile-w: 84vw;
     --edge: 20px;
-    --modal-w: 100vw;
+    --modal-w: calc(100vw - 40px);
     --modal-radius: 32px;
+    --modal-overhang: 0px;
+    --peek-gap: 8px;
   }
 
   .site-header {
@@ -735,11 +884,38 @@ main:has(> .view--home) {
   }
 
   .project-detail__body {
+    gap: 72px;
+    margin-top: 72px;
+  }
+
+  .project-detail__section {
+    --bleed: 0px;
+  }
+
+  .project-detail__lead,
+  .project-detail__more {
     max-width: none;
   }
 
-  .project-modal__nav {
-    display: none;
+  .project-detail__split,
+  .project-detail__section--left .project-detail__split {
+    grid-template-columns: 1fr;
+    row-gap: 32px;
+  }
+
+  .project-detail__section--left .project-detail__figure,
+  .project-detail__section--left .project-detail__aside {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .project-detail__media--cols-3,
+  .project-detail__media--cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .project-modal__peek {
+    --peek-w: 60vw;
   }
 
   .project-carousel.is-grid .project-carousel__track {
@@ -748,55 +924,19 @@ main:has(> .view--home) {
   }
 }
 
-/* ---------- Cursor (luva) ---------- */
+/* ---------- Cursor (mãozinha estilo Mac) ---------- */
 
-.has-custom-cursor,
-.has-custom-cursor * {
-  cursor: none !important;
+/* --cursor-hand vem do JS (effects/cursor.js), com o SVG da mão. */
+.has-hand-cursor,
+.has-hand-cursor * {
+  cursor: var(--cursor-hand) !important;
 }
 
-.has-custom-cursor input,
-.has-custom-cursor textarea {
+.has-hand-cursor
+  input:not([type='button']):not([type='submit']):not([type='checkbox']):not([type='radio']),
+.has-hand-cursor textarea,
+.has-hand-cursor [contenteditable='true'] {
   cursor: text !important;
-}
-
-.cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.cursor__swing {
-  transform-origin: 14.5px 1.3px;
-}
-
-.cursor__hand {
-  transform-origin: 14.5px 1.3px;
-  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.35));
-  transition:
-    transform 0.45s var(--ease-out),
-    opacity 0.25s ease;
-}
-
-.cursor__svg {
-  display: block;
-}
-
-.cursor.is-hidden .cursor__hand {
-  opacity: 0;
-  transform: scale(0.6);
-}
-
-.cursor.is-hover .cursor__hand {
-  transform: scale(1.18) rotate(-12deg);
-}
-
-.cursor.is-down .cursor__hand {
-  transform: scale(0.86) rotate(-4deg);
-  transition-duration: 0.12s;
 }
 
 /* ---------- Outras páginas ---------- */

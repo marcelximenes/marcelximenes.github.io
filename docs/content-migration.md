@@ -72,12 +72,16 @@ o conteúdo em inglês para quem estiver no modo PT (fallback, não é bug).
 
 ## O que NÃO foi migrado (pendente, decisão do Marcel)
 
-- **Imagens reais** dos projetos. Por pedido explícito, o site usa um
-  **placeholder visual neutro** (`ImagePlaceholder.js` — bloco cinza com o
-  nome do projeto) em vez de `<img>`, tanto no card da home quanto no
-  detalhe. Quando houver fotos reais, trocar por `<img>` em
-  `ProjectCard.js`/`ProjectDetail.js` e adicionar os arquivos em
-  `public/images/projects/<slug>/`.
+- ~~**Imagens reais** dos projetos~~ — **migradas em 03/10/2026**: as 40
+  fotos dos 6 cases do site antigo estão em `public/images/projects/<slug>/`
+  (`cover.webp` + `01…06.webp`), e a associação foto → seção (pelo número
+  da seção) está em `src/js/data/projectImages.js`.
+  - **Suposição**: no site antigo o Volvo repetia as fotos 01/02 nas seções
+    2 e 3; aqui cada foto aparece uma vez só.
+  - **Pendente**: NIDUS e Frontline não têm fotos (seguem com a arte
+    abstrata). Os textos alternativos são genéricos ("Volvo Bank — imagem
+    do case 3"); o ideal é descrever cada foto quando houver tempo.
+
 - **CV/Resume em PDF**: o site antigo linkava para
   `/CV/Resume_ Marcel Ximenes - Global Product Design.pdf`. Não foi baixado
   nem incluído — decidir se entra como link externo, arquivo estático em

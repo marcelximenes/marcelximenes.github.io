@@ -98,22 +98,28 @@ describe('createApp', () => {
     expect(root.querySelector('.project-detail__title').textContent).toBe('Stefanini Group');
   });
 
-  it('does not render a prev button for the first project in the list', () => {
+  it('wraps around: the first project peeks at the last one on its left', () => {
     const router = createApp(root, { header, footer });
     window.location.hash = '#/project/stefanini';
     router.start();
 
-    expect(root.querySelector('.project-modal__nav--prev')).toBeNull();
+    const prev = root.querySelector('.project-modal__nav--prev');
+    expect(prev).not.toBeNull();
+    expect(prev.getAttribute('aria-label')).toBe(
+      'Previous project: Frontline — Federal Design System Alignment',
+    );
     expect(root.querySelector('.project-modal__nav--next')).not.toBeNull();
   });
 
-  it('does not render a next button for the last project in the list', () => {
+  it('wraps around: the last project leads back to the first one', () => {
     const router = createApp(root, { header, footer });
     window.location.hash = '#/project/frontline';
     router.start();
 
-    expect(root.querySelector('.project-modal__nav--next')).toBeNull();
-    expect(root.querySelector('.project-modal__nav--prev')).not.toBeNull();
+    root.querySelector('.project-modal__nav--next').click();
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+
+    expect(root.querySelector('.project-detail__title').textContent).toBe('Stefanini Group');
   });
 
   it('renders a not-found state for an unknown project id', () => {

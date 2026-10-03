@@ -10,13 +10,14 @@ import { EASE_IN_OUT, EASE_OUT, animate, canAnimate, rectOf } from './motion.js'
  */
 
 const FLIGHT_MS = 950;
+const COVER = '.project-detail__cover .project-media';
 const REVEAL_MS = 850;
 
 const px = (value) => `${value}px`;
 
 /**
  * Cópia visual (fixa na tela) da imagem que vai voar entre as posições.
- * @param {HTMLElement} source - Um .image-placeholder (ou futura <img>).
+ * @param {HTMLElement} source - Um .project-media (foto ou placeholder).
  * @param {{ left: number, top: number, width: number, height: number }} rect
  * @param {string} radius
  * @returns {HTMLElement}
@@ -25,6 +26,9 @@ function createFlyer(source, rect, radius) {
   const flyer = source.cloneNode(true);
   flyer.removeAttribute('role');
   flyer.removeAttribute('aria-label');
+  if (flyer.tagName === 'IMG') {
+    flyer.alt = '';
+  }
   flyer.setAttribute('aria-hidden', 'true');
   flyer.classList.add('project-flyer');
   Object.assign(flyer.style, {
@@ -73,6 +77,30 @@ function contentParts(modal) {
 }
 
 /**
+ * Espiadas dos projetos vizinhos: entram deslizando de fora da tela (cada
+ * uma pelo seu lado) e saem do mesmo jeito.
+ * @param {HTMLElement} modal
+ * @param {'in' | 'out'} phase
+ * @param {number} [delay]
+ * @returns {Promise<void>[]}
+ */
+export function animatePeeks(modal, phase, delay = 0) {
+  return [...modal.querySelectorAll('.project-modal__peek')].map((peek) => {
+    const outward = peek.classList.contains('project-modal__nav--prev') ? -1 : 1;
+    const hidden = { opacity: 0, transform: `translateX(${outward * 80}px)` };
+    const shown = { opacity: 1, transform: 'none' };
+    return phase === 'in'
+      ? animate(peek, [hidden, shown], { duration: 900, delay, easing: EASE_OUT })
+      : animate(peek, [shown, hidden], {
+          duration: 380,
+          delay,
+          easing: EASE_IN_OUT,
+          fill: 'forwards',
+        });
+  });
+}
+
+/**
  * Anima a entrada do conteúdo (título, texto, metadados, seções).
  * @param {HTMLElement} modal
  * @param {number} delay
@@ -106,7 +134,7 @@ export function revealContent(modal, delay = 0) {
  */
 export async function openProject(card, modal) {
   const panel = modal.querySelector('.project-modal__dialog');
-  const cover = modal.querySelector('.project-detail__cover .image-placeholder');
+  const cover = modal.querySelector(COVER);
   const sourceImage = card?.querySelector('.project-card__link');
 
   if (!canAnimate() || !panel) {
@@ -124,6 +152,7 @@ export async function openProject(card, modal) {
       { duration: 900, easing: EASE_OUT },
     );
     revealContent(modal, 200);
+    animatePeeks(modal, 'in', 300);
     return;
   }
 
@@ -156,6 +185,7 @@ export async function openProject(card, modal) {
   });
 
   revealContent(modal, 450);
+  animatePeeks(modal, 'in', 550);
 
   await Promise.all([flight, reveal]);
   cover.style.visibility = '';
@@ -171,20 +201,23 @@ export async function openProject(card, modal) {
  */
 export async function closeProject(card, modal) {
   const panel = modal.querySelector('.project-modal__dialog');
-  const cover = modal.querySelector('.project-detail__cover .image-placeholder');
+  const cover = modal.querySelector(COVER);
   const targetImage = card?.querySelector('.project-card__link');
 
   if (!canAnimate() || !panel) {
     return;
   }
 
-  const fadeContent = contentParts(modal).map((part) =>
-    animate(part, [{ opacity: 1 }, { opacity: 0 }], {
-      duration: 250,
-      easing: 'ease-out',
-      fill: 'forwards',
-    }),
-  );
+  const fadeContent = [
+    ...contentParts(modal).map((part) =>
+      animate(part, [{ opacity: 1 }, { opacity: 0 }], {
+        duration: 250,
+        easing: 'ease-out',
+        fill: 'forwards',
+      }),
+    ),
+    ...animatePeeks(modal, 'out'),
+  ];
 
   if (!targetImage || !cover) {
     await Promise.all([
@@ -258,6 +291,9 @@ export async function swapProject(oldModal, newModal, direction) {
     { duration: 800, delay: 120, easing: EASE_OUT },
   );
   revealContent(newModal, 250);
+  // As espiadas trocam de imagem: as antigas somem e as novas entram.
+  animatePeeks(oldModal, 'out');
+  animatePeeks(newModal, 'in', 200);
   await animate(
     oldPanel,
     [

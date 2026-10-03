@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ProjectDetail } from '../src/js/components/ProjectDetail.js';
+import { ProjectDetail, planSectionLayouts } from '../src/js/components/ProjectDetail.js';
 
 const projectWithoutSections = {
   id: 'stefanini',
@@ -65,9 +65,64 @@ describe('ProjectDetail', () => {
     expect(detail.querySelector('.project-detail__meta-label').textContent).toBe('Cliente');
   });
 
-  it('renders an image placeholder instead of a real image', () => {
+  it('renders the cover photo for projects that have photos', () => {
     const detail = ProjectDetail(projectWithoutSections, 'en');
-    expect(detail.querySelector('.image-placeholder')).not.toBeNull();
+    const cover = detail.querySelector('.project-detail__cover img.project-media');
+    expect(cover.getAttribute('src')).toBe('/images/projects/stefanini/cover.webp');
+    expect(cover.getAttribute('alt')).toBe('Stefanini Group');
+  });
+
+  it('renders an image placeholder for projects without photos', () => {
+    const detail = ProjectDetail({ ...projectWithoutSections, id: 'nidus' }, 'en');
+    expect(detail.querySelector('.project-detail__cover .image-placeholder')).not.toBeNull();
     expect(detail.querySelector('img')).toBeNull();
+  });
+
+  it('places each section photo by section number, with numbered alt text', () => {
+    const detail = ProjectDetail(projectWithSections, 'en');
+    const images = [...detail.querySelectorAll('.project-detail__section img')];
+    expect(images.map((img) => img.getAttribute('src'))).toEqual([
+      '/images/projects/volvo/01.webp',
+      '/images/projects/volvo/02.webp',
+    ]);
+    expect(images[1].getAttribute('alt')).toBe('Volvo Bank — case study image 2');
+    expect(
+      detail
+        .querySelector('.project-detail__section')
+        .classList.contains('project-detail__section--pair'),
+    ).toBe(true);
+  });
+
+  it('puts the remaining paragraphs next to a single photo', () => {
+    const project = {
+      ...projectWithSections,
+      translations: {
+        ...projectWithSections.translations,
+        en: {
+          ...projectWithSections.translations.en,
+          sections: [{ heading: '3. Design', paragraphs: ['Lead.', 'Side one.', 'Side two.'] }],
+        },
+      },
+    };
+    const section = ProjectDetail(project, 'en').querySelector('.project-detail__section');
+    expect(section.classList.contains('project-detail__section--left')).toBe(true);
+    expect(section.querySelector('.project-detail__lead p').textContent).toBe('Lead.');
+    expect(section.querySelectorAll('.project-detail__aside p')).toHaveLength(2);
+    expect(section.querySelector('.project-detail__split img')).not.toBeNull();
+  });
+});
+
+describe('planSectionLayouts', () => {
+  it('picks a layout from the photo count, alternating single photos', () => {
+    expect(planSectionLayouts([0, 1, 3, 1, 2, 1, 1, 4])).toEqual([
+      'text',
+      'left',
+      'gallery',
+      'right',
+      'pair',
+      'wide',
+      'left',
+      'gallery',
+    ]);
   });
 });

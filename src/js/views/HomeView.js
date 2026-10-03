@@ -25,9 +25,12 @@ function buildProjectModal(selectedProjectId, locale) {
     ]);
   }
 
+  // Navegação circular: sempre há um vizinho de cada lado (do primeiro
+  // projeto, "anterior" leva ao último), como num carrossel infinito.
   const index = projects.findIndex((candidate) => candidate.id === selectedProjectId);
-  const prevProject = index > 0 ? projects[index - 1] : null;
-  const nextProject = index < projects.length - 1 ? projects[index + 1] : null;
+  const count = projects.length;
+  const prevProject = count > 1 ? projects[(index - 1 + count) % count] : null;
+  const nextProject = count > 1 ? projects[(index + 1) % count] : null;
 
   return ProjectModal(project, locale, {
     onClose: () => {
@@ -43,10 +46,25 @@ function buildProjectModal(selectedProjectId, locale) {
           window.location.hash = `#/project/${nextProject.id}`;
         }
       : null,
+    prevProject,
+    nextProject,
   });
 }
 
 const indexOf = (id) => projects.findIndex((project) => project.id === id);
+
+/**
+ * Sentido da troca entre dois projetos numa lista circular: o caminho
+ * mais curto (do último para o primeiro é "para frente").
+ * @param {string} fromId
+ * @param {string} toId
+ * @returns {1 | -1}
+ */
+export function swapDirection(fromId, toId) {
+  const count = projects.length;
+  const steps = (indexOf(toId) - indexOf(fromId) + count) % count;
+  return steps <= count / 2 ? 1 : -1;
+}
 
 /**
  * Anima a troca carrossel ↔ grade (técnica FLIP: mede antes, troca o
@@ -167,7 +185,7 @@ export function HomeView(locale, selectedProjectId = null) {
         previousModal.remove();
         return Promise.resolve();
       }
-      const direction = indexOf(id) >= indexOf(previousId) ? 1 : -1;
+      const direction = swapDirection(previousId, id);
       return swapProject(previousModal, modal, direction).then(() => previousModal.remove());
     }
 

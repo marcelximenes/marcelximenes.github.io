@@ -2,6 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import { ProjectCard } from '../src/js/components/ProjectCard.js';
 
+const projectWithoutPhotos = {
+  id: 'nidus',
+  translations: {
+    en: { title: 'NIDUS', summary: 'Child protection platform.', sections: [] },
+    pt: { title: 'NIDUS', summary: 'Plataforma de proteção infantil.', sections: [] },
+  },
+};
+
 const sampleProject = {
   id: 'volvo',
   translations: {
@@ -53,19 +61,29 @@ describe('ProjectCard', () => {
   it('wraps the image and caption in a single clickable link (whole card is the target)', () => {
     const card = ProjectCard(sampleProject, 'en');
     const link = card.querySelector('.project-card__link');
-    expect(link.querySelector('.image-placeholder')).not.toBeNull();
+    expect(link.querySelector('.project-media')).not.toBeNull();
     expect(link.querySelector('.project-card__title')).not.toBeNull();
   });
 
-  it('renders an image placeholder instead of a real image', () => {
+  it('renders the cover photo for projects that have photos', () => {
     const card = ProjectCard(sampleProject, 'en');
-    expect(card.querySelector('.image-placeholder')).not.toBeNull();
+    const img = card.querySelector('img.project-media');
+    expect(img).not.toBeNull();
+    expect(img.getAttribute('src')).toBe('/images/projects/volvo/cover.webp');
+    // O link já tem o nome do projeto: a foto não repete o texto.
+    expect(img.getAttribute('alt')).toBe('');
+    expect(card.querySelector('.image-placeholder')).toBeNull();
+  });
+
+  it('falls back to the image placeholder for projects without photos', () => {
+    const card = ProjectCard(projectWithoutPhotos, 'en');
+    expect(card.querySelector('.image-placeholder.project-media')).not.toBeNull();
     expect(card.querySelector('img')).toBeNull();
   });
 
   it('gives the placeholder a stable gradient variant derived from the project id', () => {
-    const first = ProjectCard(sampleProject, 'en').querySelector('.image-placeholder');
-    const second = ProjectCard(sampleProject, 'pt').querySelector('.image-placeholder');
+    const first = ProjectCard(projectWithoutPhotos, 'en').querySelector('.image-placeholder');
+    const second = ProjectCard(projectWithoutPhotos, 'pt').querySelector('.image-placeholder');
     expect(first.className).toMatch(/image-placeholder--v[0-3]/);
     expect(first.className).toBe(second.className);
   });

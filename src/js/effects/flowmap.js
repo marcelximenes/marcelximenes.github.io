@@ -106,6 +106,8 @@ uniform vec2 uBuffer;
 uniform vec4 uRect;
 uniform float uRadius;
 uniform float uZoom;
+uniform vec2 uCover;
+uniform float uOpacity;
 varying vec2 vLocal;
 
 float roundedBox(vec2 p, vec2 halfSize, float r) {
@@ -115,7 +117,8 @@ float roundedBox(vec2 p, vec2 halfSize, float r) {
 
 void main() {
   vec3 flow = texture2D(tFlow, gl_FragCoord.xy / uBuffer).rgb * 2.0 - 1.0;
-  vec2 uv = (vLocal - 0.5) * uZoom + 0.5;
+  // uCover: recorte "object-fit: cover" da foto dentro do tile.
+  vec2 uv = (vLocal - 0.5) * uZoom * uCover + 0.5;
   vec2 offset = flow.xy * vec2(1.0, -1.0) * 0.1;
   uv -= offset;
   float split = length(flow.xy) * 0.012;
@@ -126,7 +129,7 @@ void main() {
 
   vec2 size = uRect.zw;
   float d = roundedBox((vLocal - 0.5) * size, size * 0.5, uRadius);
-  float alpha = 1.0 - smoothstep(-0.75, 0.75, d);
+  float alpha = (1.0 - smoothstep(-0.75, 0.75, d)) * uOpacity;
   gl_FragColor = vec4(color * alpha, alpha);
 }`;
 
@@ -229,6 +232,21 @@ export function initFlowmap() {
     return createTexture(gl, paint);
   });
 
+  const ART_ASPECT = 1024 / 630;
+
+  // Fotos reais das capas: viram textura na primeira vez que aparecem já
+  // carregadas (mesma origem, então o WebGL pode lê-las).
+  const photoTextures = new Map();
+  function photoTexture(img) {
+    if (!img.complete || !img.naturalWidth) {
+      return null;
+    }
+    if (!photoTextures.has(img.currentSrc || img.src)) {
+      photoTextures.set(img.currentSrc || img.src, createTexture(gl, img));
+    }
+    return photoTextures.get(img.currentSrc || img.src);
+  }
+
   let flowRead = createFlowTarget(gl);
   let flowWrite = createFlowTarget(gl);
 
@@ -330,6 +348,15 @@ export function initFlowmap() {
     if (cards.length === 0) {
       return;
     }
+    // Acompanha a opacidade do carrossel no DOM (que some com um projeto
+    // aberto, para só as espiadas do modal aparecerem nas laterais).
+    const carouselElement = cards[0].closest('.project-carousel');
+    const opacity = carouselElement
+      ? parseFloat(window.getComputedStyle(carouselElement).opacity)
+      : 1;
+    if (!(opacity > 0.01)) {
+      return;
+    }
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.useProgram(tileProgram.prog);
@@ -341,6 +368,7 @@ export function initFlowmap() {
     gl.uniform2f(u.uBuffer, canvas.width, canvas.height);
     gl.uniform1i(u.tImage, 0);
     gl.uniform1i(u.tFlow, 1);
+    gl.uniform1f(u.uOpacity, opacity);
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, flowRead.texture);
 
@@ -349,10 +377,18 @@ export function initFlowmap() {
         return;
       }
       const link = card.querySelector('.project-card__link');
-      const placeholder = card.querySelector('.image-placeholder');
-      if (!link || !placeholder) {
+      const media = card.querySelector('.project-media');
+      if (!link || !media) {
         return;
       }
+      const isPhoto = media.tagName === 'IMG';
+      const texture = isPhoto
+        ? photoTexture(media)
+        : artTextures[Number(media.dataset.variant) || 0];
+      if (!texture) {
+        return;
+      }
+      const textureAspect = isPhoto ? media.naturalWidth / media.naturalHeight : ART_ASPECT;
       const rect = link.getBoundingClientRect();
       if (rect.right < 0 || rect.left > width || rect.bottom < 0 || rect.top > height) {
         return;
@@ -375,7 +411,13 @@ export function initFlowmap() {
       zoomByCard.set(card, zoom);
 
       gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, artTextures[Number(placeholder.dataset.variant) || 0]);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      const tileAspect = rect.width / rect.height;
+      if (textureAspect > tileAspect) {
+        gl.uniform2f(u.uCover, tileAspect / textureAspect, 1);
+      } else {
+        gl.uniform2f(u.uCover, 1, textureAspect / tileAspect);
+      }
       gl.uniform4f(u.uRect, rect.left, rect.top, rect.width, rect.height);
       gl.uniform1f(u.uRadius, radius);
       gl.uniform1f(u.uZoom, zoom);

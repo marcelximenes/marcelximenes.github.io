@@ -1,111 +1,94 @@
 /**
- * Cursor personalizado: uma luva branca de desenho animado (desenho
- * original, em SVG inline) apontando com o indicador. Segue o mouse com
- * suavização, balança levemente com a velocidade horizontal, cresce sobre
- * links/botões e "aperta" no clique. Só em dispositivos com mouse; em
- * campos de texto o cursor nativo volta (para mostrar o I de digitação).
+ * Tema de cursor: a "mãozinha" clássica do Mac (luva branca de contorno
+ * preto, indicador para cima — a que lembra a mão do Mickey), usada como
+ * cursor do site inteiro. Desenho próprio em SVG, no mesmo estilo.
+ *
+ * É um cursor nativo (CSS `cursor: url(...)`), não um elemento que segue
+ * o mouse: zero atraso e zero custo por quadro. Para ficar nítido em
+ * telas retina, o SVG é rasterizado em 1x e 2x e entregue com
+ * `image-set()`; navegadores sem suporte usam o SVG direto. Em campos de
+ * texto o I de digitação continua (regra no CSS).
  */
 
-// viewBox 40×46; a ponta do indicador (hotspot) fica em (17, 1.5).
-const GLOVE_SVG = `
-<svg class="cursor__svg" viewBox="0 0 40 46" width="34" height="39" aria-hidden="true" focusable="false">
-  <defs>
-    <g id="glove-hand">
-      <rect x="4" y="18" width="9" height="15" rx="4.5" transform="rotate(-28 8.5 25.5)"/>
-      <rect x="13" y="1.5" width="8" height="22" rx="4"/>
-      <rect x="20" y="13" width="7.5" height="12" rx="3.75"/>
-      <rect x="26.5" y="14.5" width="7" height="11" rx="3.5"/>
-      <rect x="32.5" y="16.5" width="6" height="10" rx="3"/>
-      <rect x="11" y="19" width="27.5" height="17" rx="8"/>
-    </g>
-    <g id="glove-cuff">
-      <rect x="11.5" y="33" width="27" height="6" rx="3"/>
-      <rect x="13" y="37.5" width="24" height="7" rx="3"/>
-    </g>
-  </defs>
-  <use href="#glove-hand" fill="#111" stroke="#111" stroke-width="2.6" stroke-linejoin="round"/>
-  <use href="#glove-hand" fill="#fff"/>
-  <path d="M27 16.5v6.5M33 18.5v5.5M21 20.5c1.5 1 3 1 4.5 0" fill="none" stroke="#111" stroke-width="1.3" stroke-linecap="round"/>
-  <use href="#glove-cuff" fill="#111" stroke="#111" stroke-width="2.6" stroke-linejoin="round"/>
-  <use href="#glove-cuff" fill="#fff"/>
-  <path d="M13 38h24" stroke="#111" stroke-width="1.3" stroke-linecap="round"/>
+const SIZE = 24;
+// Ponta do indicador, em px do cursor de 24×26.
+const HOTSPOT = { x: 9, y: 1 };
+
+const HAND_PATHS = `
+  <g id="h">
+    <rect x="7.4" y="1" width="3.8" height="14" rx="1.9"/>
+    <rect x="10.6" y="8.4" width="3.6" height="7.6" rx="1.8"/>
+    <rect x="13.6" y="9.4" width="3.4" height="7" rx="1.7"/>
+    <rect x="16.4" y="10.6" width="3.2" height="6.4" rx="1.6"/>
+    <rect x="3" y="11.6" width="3.6" height="8.4" rx="1.8" transform="rotate(-32 4.8 15.8)"/>
+    <path d="M6.4 13.2h13.2v4.8c0 2.4-1 4-2.4 5.2v1.8H9.2v-1.8C7.4 21.8 6.4 20 6.4 17.6z"/>
+  </g>`;
+
+export const HAND_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="26" viewBox="0 0 24 26">
+  <defs>${HAND_PATHS}</defs>
+  <use href="#h" fill="#000" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+  <use href="#h" fill="#fff"/>
+  <path d="M10.9 9.6v4.2M14 10.6v3.6M16.9 11.6v3.2" stroke="#000" stroke-width="0.9" stroke-linecap="round" fill="none"/>
 </svg>`;
 
-const HOTSPOT = { x: 14.5, y: 1.3 };
-const INTERACTIVE = 'a, button, [role="button"], label, select, summary, .project-card';
-const TEXT_INPUT =
-  'input:not([type="button"]):not([type="submit"]), textarea, [contenteditable="true"]';
+const svgUrl = () => `data:image/svg+xml,${encodeURIComponent(HAND_SVG)}`;
 
 /**
- * Liga o cursor personalizado (se fizer sentido neste dispositivo).
- * @returns {() => void} Função que desliga e remove o cursor.
+ * Valor da propriedade CSS `cursor` com a mão.
+ * @param {string} image - `url(...)` ou `image-set(...)`.
+ * @returns {string}
+ */
+export function cursorValue(image) {
+  return `${image} ${HOTSPOT.x} ${HOTSPOT.y}, pointer`;
+}
+
+/**
+ * Rasteriza o SVG da mão num PNG na escala pedida.
+ * @param {HTMLImageElement} image
+ * @param {number} scale
+ * @returns {string} data URL do PNG.
+ */
+function rasterize(image, scale) {
+  const canvas = document.createElement('canvas');
+  canvas.width = SIZE * scale;
+  canvas.height = 26 * scale;
+  const context = canvas.getContext('2d');
+  context.scale(scale, scale);
+  context.drawImage(image, 0, 0, SIZE, 26);
+  return canvas.toDataURL('image/png');
+}
+
+/**
+ * Liga o tema de cursor (só em dispositivos com mouse).
+ * @returns {() => void} Função que volta ao cursor padrão do sistema.
  */
 export function initCursor() {
   if (!window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) {
     return () => {};
   }
 
-  const cursor = document.createElement('div');
-  cursor.className = 'cursor is-hidden';
-  cursor.setAttribute('aria-hidden', 'true');
-  cursor.innerHTML = `<div class="cursor__swing"><div class="cursor__hand">${GLOVE_SVG}</div></div>`;
-  document.body.append(cursor);
-  document.documentElement.classList.add('has-custom-cursor');
+  const root = document.documentElement;
+  root.style.setProperty('--cursor-hand', cursorValue(`url("${svgUrl()}")`));
+  root.classList.add('has-hand-cursor');
 
-  const swing = cursor.querySelector('.cursor__swing');
-  const target = { x: -100, y: -100 };
-  const position = { x: -100, y: -100 };
-  let angle = 0;
-  let lastX = 0;
-  let frame = 0;
-
-  function onMove(event) {
-    target.x = event.clientX;
-    target.y = event.clientY;
-    const element = event.target instanceof Element ? event.target : null;
-    const overText = Boolean(element?.closest(TEXT_INPUT));
-    cursor.classList.toggle('is-hidden', overText);
-    cursor.classList.toggle('is-hover', !overText && Boolean(element?.closest(INTERACTIVE)));
-  }
-
-  function onLeave(event) {
-    if (!event.relatedTarget) {
-      cursor.classList.add('is-hidden');
+  // Versão nítida para retina, quando o navegador aceita image-set().
+  const image = new Image();
+  image.onload = () => {
+    try {
+      const crisp = cursorValue(
+        `image-set(url("${rasterize(image, 1)}") 1x, url("${rasterize(image, 2)}") 2x)`,
+      );
+      if (window.CSS?.supports?.('cursor', crisp)) {
+        root.style.setProperty('--cursor-hand', crisp);
+      }
+    } catch {
+      // Sem canvas: fica o SVG direto, que já funciona.
     }
-  }
-
-  const onDown = () => cursor.classList.add('is-down');
-  const onUp = () => cursor.classList.remove('is-down');
-
-  function tick() {
-    // Suavização: persegue o mouse rápido, mas sem "teleportar".
-    position.x += (target.x - position.x) * 0.38;
-    position.y += (target.y - position.y) * 0.38;
-
-    // Balanço proporcional à velocidade horizontal, que volta ao repouso.
-    const velocity = position.x - lastX;
-    lastX = position.x;
-    const targetAngle = Math.max(-22, Math.min(22, velocity * 1.4));
-    angle += (targetAngle - angle) * 0.15;
-
-    cursor.style.transform = `translate3d(${position.x - HOTSPOT.x}px, ${position.y - HOTSPOT.y}px, 0)`;
-    swing.style.transform = `rotate(${angle}deg)`;
-    frame = window.requestAnimationFrame(tick);
-  }
-
-  window.addEventListener('pointermove', onMove, { passive: true });
-  document.addEventListener('pointerout', onLeave);
-  window.addEventListener('pointerdown', onDown);
-  window.addEventListener('pointerup', onUp);
-  frame = window.requestAnimationFrame(tick);
+  };
+  image.src = svgUrl();
 
   return () => {
-    window.cancelAnimationFrame(frame);
-    window.removeEventListener('pointermove', onMove);
-    document.removeEventListener('pointerout', onLeave);
-    window.removeEventListener('pointerdown', onDown);
-    window.removeEventListener('pointerup', onUp);
-    cursor.remove();
-    document.documentElement.classList.remove('has-custom-cursor');
+    root.classList.remove('has-hand-cursor');
+    root.style.removeProperty('--cursor-hand');
   };
 }

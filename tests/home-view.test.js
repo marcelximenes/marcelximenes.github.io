@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { HomeView } from '../src/js/views/HomeView.js';
+import { HomeView, swapDirection } from '../src/js/views/HomeView.js';
 
 function mount(view) {
   document.body.innerHTML = '';
@@ -83,5 +83,14 @@ describe('HomeView', () => {
       await view.setSelectedProject('volvo');
       expect(view.querySelectorAll('.project-modal')).toHaveLength(1);
     });
+  });
+});
+
+describe('swapDirection', () => {
+  it('moves forward/backward by the shortest way around the circular list', () => {
+    expect(swapDirection('stefanini', 'volvo')).toBe(1);
+    expect(swapDirection('volvo', 'stefanini')).toBe(-1);
+    expect(swapDirection('frontline', 'stefanini')).toBe(1);
+    expect(swapDirection('stefanini', 'frontline')).toBe(-1);
   });
 });
